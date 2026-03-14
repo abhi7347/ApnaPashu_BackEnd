@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="FluentValidation" Version="11.8.1" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\APNAPASHU.Common\APNAPASHU.Common.csproj" />
+    <ProjectReference Include="..\APNAPASHU.DataContract\APNAPASHU.DataContract.csproj" />
+    <ProjectReference Include="..\APNAPASHU.RepositoryContract\APNAPASHU.RepositoryContract.csproj" />
+  </ItemGroup>
+
+</Project>

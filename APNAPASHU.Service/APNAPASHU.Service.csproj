@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.102.0" />
+    <PackageReference Include="CorePush" Version="3.0.11" />
+    <PackageReference Include="EPPlus" Version="7.0.11" />
+    <PackageReference Include="FluentValidation" Version="11.8.1" />
+    <PackageReference Include="MailKit" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\APNAPASHU.Common\APNAPASHU.Common.csproj" />
+    <ProjectReference Include="..\APNAPASHU.DataContract\APNAPASHU.DataContract.csproj" />
+    <ProjectReference Include="..\APNAPASHU.Repository\APNAPASHU.Repository.csproj" />
+    <ProjectReference Include="..\APNAPASHU.RepositoryContract\APNAPASHU.RepositoryContract.csproj" />
+    <ProjectReference Include="..\APNAPASHU.ServiceContract\APNAPASHU.ServiceContract.csproj" />
+  </ItemGroup>
+
+</Project>
