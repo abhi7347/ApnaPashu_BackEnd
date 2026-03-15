@@ -16,4 +16,8 @@
     <ProjectReference Include="..\APNAPASHU.RepositoryContract\APNAPASHU.RepositoryContract.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mobile\" />
+  </ItemGroup>
+
 </Project>

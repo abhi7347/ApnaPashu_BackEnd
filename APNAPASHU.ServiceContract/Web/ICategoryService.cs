@@ -1,5 +1,5 @@
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.DataContract.Models.Category;
+using APNAPASHU.DataContract.Models.Web.Categories;
 
 namespace APNAPASHU.ServiceContract.Web
 {
@@ -11,21 +11,24 @@ namespace APNAPASHU.ServiceContract.Web
         /// <summary>
         /// Get all categories with filtering and pagination
         /// </summary>
-        Task<JsonModel<CategoryListResponseDto>> GetAllAsync(CategoryFilterDto filterDto);
+        Task<JsonModel<List<CatetoryResponseModel>>> GetAllAsync(FilterDto filterDto);
 
         /// <summary>
         /// Create or Update category (Upsert)
         /// </summary>
-        Task<JsonModel<CategoryResponseDto>> UpsertAsync(CategoryUpsertDto upsertDto);
+        Task<JsonModel<CatetoryResponseModel>> GetByIdAsync(int categoryId);
 
         /// <summary>
         /// Update category status (IsActive)
         /// </summary>
-        Task<JsonModel<bool>> UpdateStatusAsync(CategoryStatusUpdateDto statusDto);
+        Task<JsonModel<object>> UpsertAsync(CategoryUpsertModel model, int userId);
 
         /// <summary>
         /// Delete category (soft delete)
         /// </summary>
-        Task<JsonModel<bool>> DeleteAsync(int categoryId);
+        Task<JsonModel<object>> DeleteAsync(int categoryId, int userId);
+
+        Task<JsonModel<object>> UpdateStatusAsync(UpdateStatusDto model);
+
     }
 }

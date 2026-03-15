@@ -1,10 +1,10 @@
 using APNAPASHU.API.Filters;
 using APNAPASHU.API.Middlewares;
-using APNAPASHU.API.Extensions;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using APNAPASHU.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,16 +112,11 @@ if (!string.IsNullOrEmpty(secretKey))
     });
 }
 
-// Register Services - Web, Mobile, and Common
-builder.Services.AddWebServices();
-builder.Services.AddMobileServices();
-builder.Services.AddCommonServices();
-
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// Add Environment support
-builder.Services.AddEnvironmentVariableProvider();
+// Register Web Services
+builder.Services.AddWebServices();
 
 var app = builder.Build();
 

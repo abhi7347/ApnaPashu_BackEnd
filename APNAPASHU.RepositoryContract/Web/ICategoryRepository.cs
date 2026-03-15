@@ -1,4 +1,5 @@
-using APNAPASHU.DataContract.Models.Category;
+using APNAPASHU.DataContract.Models;
+using APNAPASHU.DataContract.Models.Web.Categories;
 
 namespace APNAPASHU.RepositoryContract.Web
 {
@@ -10,36 +11,27 @@ namespace APNAPASHU.RepositoryContract.Web
         /// <summary>
         /// Get all categories with filtering and pagination
         /// </summary>
-        Task<List<CategoryResponseDto>> GetAllAsync(CategoryFilterDto filterDto);
+        Task<List<CatetoryResponseModel>> GetAllAsync(FilterDto filterDto);
 
         /// <summary>
         /// Get category by ID
         /// </summary>
-        Task<CategoryResponseDto> GetByIdAsync(int categoryId);
+        Task<CatetoryResponseModel> GetByIdAsync(int categoryId);
 
         /// <summary>
         /// Create category
         /// </summary>
-        Task<int> CreateAsync(CategoryUpsertDto upsertDto);
+        Task<SqlResponseModel> UpsertAsync(CategoryUpsertModel model, int userId);
 
         /// <summary>
         /// Update category (full properties)
         /// </summary>
-        Task<bool> UpdateAsync(CategoryUpsertDto upsertDto);
-
-        /// <summary>
-        /// Update category status (IsActive)
-        /// </summary>
-        Task<bool> UpdateStatusAsync(CategoryStatusUpdateDto statusDto);
+        Task<SqlResponseModel> UpdateStatusAsync(UpdateStatusDto updateStatusDto);
 
         /// <summary>
         /// Delete category (soft delete)
         /// </summary>
-        Task<bool> DeleteAsync(int categoryId);
+        Task<SqlResponseModel> DeleteAsync(int categoryId, int userId);
 
-        /// <summary>
-        /// Get total count with filter
-        /// </summary>
-        Task<int> GetTotalCountAsync(CategoryFilterDto filterDto);
     }
 }

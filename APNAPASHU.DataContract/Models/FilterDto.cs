@@ -11,27 +11,27 @@ namespace APNAPASHU.DataContract.Models
         /// <summary>
         /// Current page number (1-based).
         /// </summary>
-        public int PageNumber { get; set; } = 1;
+        public int? PageNumber { get; set; } = 1;
 
         /// <summary>
         /// Number of records per page.
         /// </summary>
-        public int PageSize { get; set; } = 10;
+        public int? PageSize { get; set; } = 10;
 
         /// <summary>
         /// Search keyword (optional).
         /// </summary>
-        public string SearchTerm { get; set; }
+        public string? SearchTerm { get; set; }
 
         /// <summary>
         /// Column name to sort by (optional).
         /// </summary>
-        public string SortBy { get; set; }
+        public string? SortCulumn { get; set; }
 
         /// <summary>
         /// Sort direction: ASC or DESC.
         /// </summary>
-        public string SortDirection { get; set; } = "DESC";
+        public string? SortDirection { get; set; } = "DESC";
 
 
         /// <summary>

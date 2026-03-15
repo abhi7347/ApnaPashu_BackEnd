@@ -10,4 +10,8 @@
     <ProjectReference Include="..\APNAPASHU.DataContract\APNAPASHU.DataContract.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mobile\" />
+  </ItemGroup>
+
 </Project>

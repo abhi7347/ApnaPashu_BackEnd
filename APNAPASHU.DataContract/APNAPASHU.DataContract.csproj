@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Mobile\" />
-    <Folder Include="Models\Web\" />
   </ItemGroup>
 
 </Project>

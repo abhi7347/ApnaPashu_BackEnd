@@ -1,9 +1,11 @@
 using Dapper;
-using APNAPASHU.DataContract.Models.Category;
 using APNAPASHU.RepositoryContract.Web;
 using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using APNAPASHU.DataContract.Models.Web.Categories;
+using APNAPASHU.DataContract.Models;
+using APNAPASHU.DataContract.Enums;
 
 namespace APNAPASHU.Repository.Web
 {
@@ -19,228 +21,97 @@ namespace APNAPASHU.Repository.Web
         /// <summary>
         /// Get all categories with filtering and pagination
         /// </summary>
-        public async Task<List<CategoryResponseDto>> GetAllAsync(CategoryFilterDto filterDto)
+        public async Task<List<CatetoryResponseModel>> GetAllAsync(FilterDto filterDto)
         {
-            try
-            {
-                int offset = (filterDto.PageNumber - 1) * filterDto.PageSize;
-                string query = @"
-                    SELECT CategoryId, CategoryName, Description, IconUrl, 
-                           CreatedDate, UpdatedDate, IsActive
-                    FROM Categories
-                    WHERE 1=1";
+            DynamicParameters parameter = new DynamicParameters();
 
-                // Add IsActive filter
-                if (filterDto.IsActive.HasValue)
-                    query += " AND IsActive = @IsActive";
+            parameter.Add("@PageNumber", filterDto.PageNumber, DbType.Int32, ParameterDirection.Input);
+            parameter.Add("@PageSize", filterDto.PageSize, DbType.Int32, ParameterDirection.Input);
+            parameter.Add("@SearchTerm", filterDto .SearchTerm, DbType.String, ParameterDirection.Input);
+            parameter.Add("@SortColumns", filterDto.SortCulumn, DbType.String, ParameterDirection.Input);
+            parameter.Add("@SortDirection", filterDto.SortDirection, DbType.String, ParameterDirection.Input);
 
-                // Add search filter
-                if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
-                    query += @" AND (CategoryName LIKE '%' + @SearchTerm + '%' 
-                             OR Description LIKE '%' + @SearchTerm + '%')";
+            return await GetAsyncList<CatetoryResponseModel>(
+                "[dbo].[usp_GetAllCategories]",
+                parameter,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
 
-                query += @" ORDER BY CategoryName
-                           OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    if (filterDto.IsActive.HasValue)
-                        parameters.Add("@IsActive", filterDto.IsActive.Value ? 1 : 0);
-                    if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
-                        parameters.Add("@SearchTerm", filterDto.SearchTerm);
-                    parameters.Add("@Offset", offset);
-                    parameters.Add("@PageSize", filterDto.PageSize);
-
-                    var result = await conn.QueryAsync<CategoryResponseDto>(query, parameters);
-                    return result.ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving categories: {ex.Message}", ex);
-            }
         }
 
         /// <summary>
         /// Get category by ID
         /// </summary>
-        public async Task<CategoryResponseDto> GetByIdAsync(int categoryId)
+        public async Task<CatetoryResponseModel> GetByIdAsync(int categoryId)
         {
-            try
-            {
-                string query = @"
-                    SELECT CategoryId, CategoryName, Description, IconUrl, 
-                           CreatedDate, UpdatedDate, IsActive
-                    FROM Categories
-                    WHERE CategoryId = @CategoryId";
+            string query = @"SELECT CategoryId, CategoryName, Description, IconUrl,
+                    CreatedDate, UpdatedDate, IsActive
+                    FROM Categories";
 
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("@CategoryId", categoryId);
+            var result = await GetAsyncList<CatetoryResponseModel>(
+                query,
+                null,
+                CommandType.Text,
+                DataBaseNameEnum.APNAPASHU
+            );
 
-                    return await conn.QueryFirstOrDefaultAsync<CategoryResponseDto>(query, parameters);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving category: {ex.Message}", ex);
-            }
+            return result.FirstOrDefault(x => x.Id == categoryId);
         }
 
         /// <summary>
         /// Create category
         /// </summary>
-        public async Task<int> CreateAsync(CategoryUpsertDto upsertDto)
+        public async Task<SqlResponseModel> UpsertAsync(CategoryUpsertModel model, int userId)
         {
-            try
-            {
-                string query = @"
-                    INSERT INTO Categories (CategoryName, Description, IconUrl, CreatedDate, UpdatedDate, IsActive)
-                    VALUES (@CategoryName, @Description, @IconUrl, @CreatedDate, @UpdatedDate, 1);
-                    SELECT CAST(SCOPE_IDENTITY() as int)";
+            var parameters = new DynamicParameters();
 
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("@CategoryName", upsertDto.CategoryName);
-                    parameters.Add("@Description", upsertDto.Description ?? string.Empty);
-                    parameters.Add("@IconUrl", upsertDto.IconUrl ?? string.Empty);
-                    parameters.Add("@CreatedDate", DateTime.UtcNow);
-                    parameters.Add("@UpdatedDate", DateTime.UtcNow);
+            parameters.Add("@CategoryId", model.Id);
+            parameters.Add("@CategoryName", model.CategoryName);
+            parameters.Add("@Description", model.Description);
+            parameters.Add("@ImagePage", model.ImagePath);
+            parameters.Add("@UserId", userId);
 
-                    return await conn.ExecuteScalarAsync<int>(query, parameters);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error creating category: {ex.Message}", ex);
-            }
-        }
 
-        /// <summary>
-        /// Update category (full properties)
-        /// </summary>
-        public async Task<bool> UpdateAsync(CategoryUpsertDto upsertDto)
-        {
-            try
-            {
-                string query = @"
-                    UPDATE Categories
-                    SET CategoryName = @CategoryName,
-                        Description = @Description,
-                        IconUrl = @IconUrl,
-                        UpdatedDate = @UpdatedDate
-                    WHERE CategoryId = @CategoryId";
-
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("@CategoryId", upsertDto.CategoryId);
-                    parameters.Add("@CategoryName", upsertDto.CategoryName);
-                    parameters.Add("@Description", upsertDto.Description ?? string.Empty);
-                    parameters.Add("@IconUrl", upsertDto.IconUrl ?? string.Empty);
-                    parameters.Add("@UpdatedDate", DateTime.UtcNow);
-
-                    int rowsAffected = await conn.ExecuteAsync(query, parameters);
-                    return rowsAffected > 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error updating category: {ex.Message}", ex);
-            }
+            return await AddAsync<SqlResponseModel>(
+                "usp_UpsertCategory",
+                parameters,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
         }
 
         /// <summary>
         /// Update category status (IsActive)
         /// </summary>
-        public async Task<bool> UpdateStatusAsync(CategoryStatusUpdateDto statusDto)
+        public async Task<SqlResponseModel> UpdateStatusAsync(UpdateStatusDto model)
         {
-            try
-            {
-                string query = @"
-                    UPDATE Categories
-                    SET IsActive = @IsActive, UpdatedDate = @UpdatedDate
-                    WHERE CategoryId = @CategoryId";
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@Id", model.Id);
+            parameters.Add("@IsActive", model.Status ? 1 : 0);
+            parameters.Add("@UserId", model.UserId);
 
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("@CategoryId", statusDto.CategoryId);
-                    parameters.Add("@IsActive", statusDto.IsActive ? 1 : 0);
-                    parameters.Add("@UpdatedDate", DateTime.UtcNow);
 
-                    int rowsAffected = await conn.ExecuteAsync(query, parameters);
-                    return rowsAffected > 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error updating status: {ex.Message}", ex);
-            }
+            return await UpdateAsync<SqlResponseModel>(
+                "dbo.usp_UpdateCategoryStatus",
+                parameters,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
         }
 
-        /// <summary>
-        /// Delete category (soft delete - sets IsActive to 0)
-        /// </summary>
-        public async Task<bool> DeleteAsync(int categoryId)
+        public async Task<SqlResponseModel> DeleteAsync(int categoryId, int userId)
         {
-            try
-            {
-                string query = @"
-                    UPDATE Categories
-                    SET IsActive = 0, UpdatedDate = @UpdatedDate
-                    WHERE CategoryId = @CategoryId";
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@Id", categoryId);
 
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    parameters.Add("@CategoryId", categoryId);
-                    parameters.Add("@UpdatedDate", DateTime.UtcNow);
-
-                    int rowsAffected = await conn.ExecuteAsync(query, parameters);
-                    return rowsAffected > 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error deleting category: {ex.Message}", ex);
-            }
+            return await UpdateAsync<SqlResponseModel>(
+                "dbo.usp_DeleteCategory",
+                parameters,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
         }
 
-        /// <summary>
-        /// Get total count with filter
-        /// </summary>
-        public async Task<int> GetTotalCountAsync(CategoryFilterDto filterDto)
-        {
-            try
-            {
-                string query = "SELECT COUNT(*) FROM Categories WHERE 1=1";
-
-                if (filterDto.IsActive.HasValue)
-                    query += " AND IsActive = @IsActive";
-
-                if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
-                    query += @" AND (CategoryName LIKE '%' + @SearchTerm + '%' 
-                             OR Description LIKE '%' + @SearchTerm + '%')";
-
-                using (IDbConnection conn = GetConnection())
-                {
-                    var parameters = new DynamicParameters();
-                    if (filterDto.IsActive.HasValue)
-                        parameters.Add("@IsActive", filterDto.IsActive.Value ? 1 : 0);
-                    if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
-                        parameters.Add("@SearchTerm", filterDto.SearchTerm);
-
-                    return await conn.ExecuteScalarAsync<int>(query, parameters);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error counting categories: {ex.Message}", ex);
-            }
-        }
     }
 }

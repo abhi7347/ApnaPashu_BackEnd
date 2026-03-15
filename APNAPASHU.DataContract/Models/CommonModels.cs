@@ -5,9 +5,10 @@ namespace APNAPASHU.DataContract.Models
     /// </summary>
     public class JsonModel<T>
     {
+
         public JsonModel() { }
 
-        public JsonModel(object data, string message, int statusCode, string appError = "")
+        public JsonModel(object? data, string? message, int? statusCode, string? appError = "")
         {
             Data = data;
             Message = message;
@@ -15,31 +16,42 @@ namespace APNAPASHU.DataContract.Models
             AppError = appError;
         }
 
-        public string AppError { get; set; }
-        public object Data { get; set; }
-        public string Message { get; set; }
-        public int StatusCode { get; set; }
-        public string AccessToken { get; set; }
+        public string? AppError { get; set; }
+        public object? Data { get; set; }
+        public string? Message { get; set; }
+        public int? StatusCode { get; set; }
+        public string? AccessToken { get; set; }
     }
 
-    /// <summary>
-    /// Base pagination DTO
-    /// </summary>
-    public class BasePaginationDto
+    public class CommonAuditDto
     {
-        public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
-        public int TotalRecords { get; set; }
-        public int TotalPages => (TotalRecords + PageSize - 1) / PageSize;
+        public int Id { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public int? CreatedBy { get; set; }
+
+        public DateTime? UpdatedDate { get; set; }
+
+        public int? UpdatedBy { get; set; }
+
+        public DateTime? DeletedDate { get; set; }
+
+        public int? DeletedBy { get; set; }
+
+        public int? TotalRecords { get; set; }
     }
 
-    /// <summary>
-    /// Status response model
-    /// </summary>
-    public class StatusModel
+    public class UpdateStatusDto
     {
-        public int StatusCode { get; set; }
-        public string StatusMessage { get; set; }
-        public bool IsSuccess { get; set; }
+        public int Id { get; set; }
+        public bool Status { get; set; }
+
+        public int? UserId { get; set; }
     }
+
 }
