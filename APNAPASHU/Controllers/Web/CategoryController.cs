@@ -5,7 +5,7 @@ using APNAPASHU.DataContract.Models.Web.Categories;
 
 namespace APNAPASHU.API.Controllers.Web
 {
-    [Route("api/web/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : BaseController
     {
@@ -26,7 +26,7 @@ namespace APNAPASHU.API.Controllers.Web
         /// <summary>
         /// Get all categories
         /// </summary>
-        [HttpGet("get-all")]
+        [HttpGet("web/get-all")]
         [ProducesResponseType(typeof(JsonModel<List<CatetoryResponseModel>>), 200)]
         public async Task<IActionResult> GetAll([FromQuery] FilterDto filter)
         {

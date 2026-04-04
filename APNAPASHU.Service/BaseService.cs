@@ -3,45 +3,37 @@ using Microsoft.AspNetCore.Http;
 
 namespace APNAPASHU.Service
 {
-    /// <summary>
-    /// Base Service with common functionality
-    /// </summary>
     public abstract class BaseService
     {
-        protected IConfiguration Configuration { get; set; }
-        protected string ClientIPAddress { get; set; } = string.Empty;
-        protected int LoggedInUserId { get; set; }
-        protected string FullUserName { get; set; } = string.Empty;
-        protected string ApplicationHostUrl { get; set; } = string.Empty;
-        protected IHttpContextAccessor HttpContextAccessor { get; private set; }
+        protected IConfiguration Configuration { get; }
+        protected IHttpContextAccessor HttpContextAccessor { get; }
+        public readonly R2Uploader _uploader;
+        public readonly HttpClient _httpClient;
 
         public BaseService(IHttpContextAccessor accessor, IConfiguration configuration)
         {
-            HttpContextAccessor = accessor;
-            Configuration = configuration;
+            HttpContextAccessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
+            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            if (accessor?.HttpContext != null)
-            {
-                try
-                {
-                    ApplicationHostUrl = accessor.HttpContext.Request.Scheme + "://" + accessor.HttpContext.Request.Host;
-                    ClientIPAddress = accessor.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
+            _httpClient = new HttpClient();
 
-                    if (accessor.HttpContext.User?.Identity?.IsAuthenticated == true)
-                    {
-                        var userIdClaim = accessor.HttpContext.User.FindFirst("UserId");
-                        if (int.TryParse(userIdClaim?.Value, out int userId))
-                            LoggedInUserId = userId;
-
-                        var nameClaim = accessor.HttpContext.User.FindFirst("FullUserName");
-                        FullUserName = nameClaim?.Value ?? string.Empty;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Log exception if needed
-                }
-            }
+            _uploader = new R2Uploader(CDN_AccountId, CDN_AccessKey, CDN_SecretKey, CDN_BucketName);
         }
+
+        public string CDN_AccountId =>
+            Configuration["CloudfairStorageCDN:accountId"]
+            ?? throw new Exception("AccountId missing in config");
+
+        public string CDN_AccessKey =>
+            Configuration["CloudfairStorageCDN:accessKey"]
+            ?? throw new Exception("AccessKey missing in config");
+
+        public string CDN_SecretKey =>
+            Configuration["CloudfairStorageCDN:secretKey"]
+            ?? throw new Exception("SecretKey missing in config");
+
+        public string CDN_BucketName =>
+            Configuration["CloudfairStorageCDN:bucketName"]
+            ?? throw new Exception("BucketName missing in config");
     }
 }

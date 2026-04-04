@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using APNAPASHU.API.Extensions;
+using APNAPASHU.Repository.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,6 +117,9 @@ if (!string.IsNullOrEmpty(secretKey))
 
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register Web Services
 builder.Services.AddWebServices();
