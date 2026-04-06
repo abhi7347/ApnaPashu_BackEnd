@@ -11,5 +11,8 @@ namespace APNAPASHU.Repository.Data
         }
 
         public DbSet<Categories> Categories { get; set; }
+
+        public DbSet<Roles> Roles { get; set; }
+
     }
 }

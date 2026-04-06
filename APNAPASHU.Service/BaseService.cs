@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using System.Net.Mail;
+using System.Net;
+using APNAPASHU.DataContract.Models;
 
 namespace APNAPASHU.Service
 {
@@ -35,5 +38,44 @@ namespace APNAPASHU.Service
         public string CDN_BucketName =>
             Configuration["CloudfairStorageCDN:bucketName"]
             ?? throw new Exception("BucketName missing in config");
+
+
+        /// <summary>
+        /// Send email functionality.
+        /// </summary>
+        public async Task<bool> SendEmailAsync(EmailModel model)
+        {
+            try
+            {
+                using var message = new MailMessage
+                {
+                    From = new MailAddress(Configuration["Email:From"], "ApnaPashu"),
+                    Subject = model.Subject,
+                    Body = model.Body,
+                    IsBodyHtml = true,
+                };
+
+                message.To.Add(model.To);
+
+                using var client = new SmtpClient
+                {
+                    Host = Configuration["Email:Host"],
+                    Port = int.Parse(Configuration["Email:Port"]),
+                    Credentials = new NetworkCredential(
+                        Configuration["Email:Username"],
+                        Configuration["Email:Password"]
+                    ),
+                    EnableSsl = true
+                };
+
+                await client.SendMailAsync(message);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Email Error: " + ex.Message);
+                return false;
+            }
+        }
     }
 }

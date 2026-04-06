@@ -33,5 +33,16 @@ namespace APNAPASHU.API.Controllers
             var result = await _masterDropdownsService.GetCategoriesDropDowns();
             return Ok(result);
         }
+        
+        /// <summary>
+        /// Get all roles dropdowns values
+        /// </summary>
+        [HttpGet("get-roles-dropdowns")]
+        [ProducesResponseType(typeof(JsonModel<List<CatetoryResponseModel>>), 200)]
+        public async Task<IActionResult> GetAllRolesDropdowns()
+        {
+            var result = await _masterDropdownsService.GetRolesDropDowns();
+            return Ok(result);
+        }
     }
 }

@@ -5,5 +5,6 @@ namespace APNAPASHU.RepositoryContract
     public interface IMasterDropdownsRepository
     {
         public Task<List<MasterDropdownsModels>> GetCategoriesDropDowns();
+        public Task<List<MasterDropdownsModels>> GetRolesDropDowns();
     }
 }

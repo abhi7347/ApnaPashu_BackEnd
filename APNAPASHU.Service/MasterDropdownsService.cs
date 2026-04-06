@@ -17,5 +17,10 @@ namespace APNAPASHU.ServiceContract
         {
             return await _masterDropdownsRepo.GetCategoriesDropDowns();
         }
+
+        public async Task<List<MasterDropdownsModels>> GetRolesDropDowns()
+        {
+            return await _masterDropdownsRepo.GetRolesDropDowns();
+        }
     }
 }

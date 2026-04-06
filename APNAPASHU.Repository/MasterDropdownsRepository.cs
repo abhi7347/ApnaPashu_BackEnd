@@ -25,5 +25,17 @@ namespace APNAPASHU.Repository
                 })
                 .ToListAsync();
         }
+        
+        public async Task<List<MasterDropdownsModels>> GetRolesDropDowns()
+        {
+            return await _context.Roles
+                .Where(x => x.IsActive && !x.IsDeleted)
+                .Select(x => new MasterDropdownsModels
+                {
+                    Id = x.Id,
+                    Name = x.RoleName
+                })
+                .ToListAsync();
+        }
     }
 }

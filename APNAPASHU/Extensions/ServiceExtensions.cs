@@ -20,6 +20,9 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IMasterDropdownsService, MasterDropdownsService>();
             services.AddScoped<IMasterDropdownsRepository, MasterDropdownsRepository>();
 
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 
             // Mobile APIs
 
