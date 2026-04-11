@@ -1,4 +1,5 @@
 using System.Data;
+using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Authentication;
 using APNAPASHU.RepositoryContract.Web;
 using Dapper;
@@ -12,35 +13,29 @@ namespace APNAPASHU.Repository.Web
         {
         }
 
-        public async Task<AuthResponseModel> RegisterAsync(RegisterRequestModel model)
+        public async Task<SqlResponseModel> RegisterAsync(RegisterRequestModel model)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@RoleId", model.RoleId);
             parameters.Add("@FirstName", model.FirstName);
-            parameters.Add("@MiddleName", model.MiddleName);
             parameters.Add("@LastName", model.LastName);
             parameters.Add("@Email", model.Email);
             parameters.Add("@Phone", model.PhoneNumber);
-            parameters.Add("@GenderCode", model.GenderCode);
             parameters.Add("@PasswordHash", model.Password); // Already hashed in Service
-            parameters.Add("@Address", model.Address);
-            parameters.Add("@DOB", model.DOB);
-            parameters.Add("@PinCode", model.PinCode);
-            parameters.Add("@City", model.City);
-            parameters.Add("@StateId", model.StateId);
-            parameters.Add("@CountryId", model.CountryId);
             parameters.Add("@IsTermsAccepted", model.IsTermsAccepted);
 
-            // The SP returns Status and Message. We'll map them to AuthResponseModel
-            return await GetFirstOrDefaultAsync<AuthResponseModel>("usp_RegisterUser", parameters, CommandType.StoredProcedure);
+            // Using AddAsync<T> from BaseRepository for Registration
+            return await AddAsync<SqlResponseModel>("usp_RegisterUser", parameters, CommandType.StoredProcedure);
         }
 
-        public async Task<AuthResponseModel> GetUserByEmailAsync(string email)
+        public async Task<LoginResponseModel> LoginUserAsync(string email, string password)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Email", email);
+            parameters.Add("@Password", password);
 
-            return await GetFirstOrDefaultAsync<AuthResponseModel>("usp_UserLogin", parameters, CommandType.StoredProcedure);
+            // Using GetQuerySingleOrDefaultAsync<T> from BaseRepository for Login
+            return await GetQuerySingleOrDefaultAsync<LoginResponseModel>("usp_UserLogin", parameters, CommandType.StoredProcedure);
         }
     }
 }

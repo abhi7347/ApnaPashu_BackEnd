@@ -139,6 +139,8 @@ app.UseErrorHandlingMiddleware();
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 // Use CORS
 app.UseCors("AllowSpecific");
 

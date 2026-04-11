@@ -5,7 +5,7 @@ namespace APNAPASHU.ServiceContract.Web
 {
     public interface IAuthenticationService
     {
-        Task<JsonModel<AuthResponseModel>> RegisterAsync(RegisterRequestModel model);
-        Task<JsonModel<AuthResponseModel>> LoginAsync(LoginRequestModel model);
+        Task<JsonModel<SqlResponseModel>> RegisterAsync(RegisterRequestModel model);
+        Task<JsonModel<LoginResponseModel>> LoginUserAsync(string email, string password);
     }
 }

@@ -65,8 +65,7 @@ namespace APNAPASHU.Service.Web
             return new JsonModel<object>(
                 result,
                 result.Message,
-                result.StatusCode
-
+                result.StatusCode == "SUCCESS" ? 200 : 400
             );
         }
 
@@ -77,7 +76,7 @@ namespace APNAPASHU.Service.Web
             return new JsonModel<object>(
                 result,
                 result.Message,
-                result.StatusCode
+                result.StatusCode == "SUCCESS" ? 200 : 400
             );
         }
 
@@ -88,7 +87,7 @@ namespace APNAPASHU.Service.Web
             return new JsonModel<object>(
                 result,
                 result.Message,
-                result.StatusCode
+                result.StatusCode == "SUCCESS" ? 200 : 400
             );
         }
     }

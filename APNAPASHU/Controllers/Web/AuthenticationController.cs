@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.ServiceContract.Web;
 using APNAPASHU.DataContract.Models.Web.Authentication;
-using Microsoft.Extensions.Logging;
 
 namespace APNAPASHU.API.Controllers.Web
 {
@@ -28,7 +27,7 @@ namespace APNAPASHU.API.Controllers.Web
         /// User Registration
         /// </summary>
         [HttpPost("register")]
-        [ProducesResponseType(typeof(JsonModel<AuthResponseModel>), 200)]
+        [ProducesResponseType(typeof(JsonModel<SqlResponseModel>), 200)]
         public async Task<IActionResult> Register([FromBody] RegisterRequestModel model)
         {
             if (string.IsNullOrEmpty(model.Email) || !IsValidEmail(model.Email))
@@ -42,13 +41,13 @@ namespace APNAPASHU.API.Controllers.Web
         /// User Login
         /// </summary>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(JsonModel<AuthResponseModel>), 200)]
+        [ProducesResponseType(typeof(JsonModel<LoginResponseModel>), 200)]
         public async Task<IActionResult> Login([FromBody] LoginRequestModel model)
         {
             if (string.IsNullOrEmpty(model.Email))
                 return BadRequest(new JsonModel<object>(null, "Email is required", 400));
 
-            var result = await _authenticationService.LoginAsync(model);
+            var result = await _authenticationService.LoginUserAsync(model.Email, model.Password);
             return Ok(result);
         }
     }
