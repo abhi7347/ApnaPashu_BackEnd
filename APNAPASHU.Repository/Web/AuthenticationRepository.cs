@@ -32,10 +32,27 @@ namespace APNAPASHU.Repository.Web
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Email", email);
-            parameters.Add("@Password", password);
-
             // Using GetQuerySingleOrDefaultAsync<T> from BaseRepository for Login
             return await GetQuerySingleOrDefaultAsync<LoginResponseModel>("usp_UserLogin", parameters, CommandType.StoredProcedure);
+        }
+
+        public async Task<SqlResponseModel> ForgotPasswordAsync(string email, string token)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Email", email);
+            parameters.Add("@ResetToken", token);
+
+            return await GetQuerySingleOrDefaultAsync<SqlResponseModel>("usp_ForgotPassword", parameters, CommandType.StoredProcedure);
+        }
+
+        public async Task<SqlResponseModel> ResetPasswordAsync(string email, string token, string newPasswordHash)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Email", email);
+            parameters.Add("@ResetToken", token);
+            parameters.Add("@NewPasswordHash", newPasswordHash);
+
+            return await GetQuerySingleOrDefaultAsync<SqlResponseModel>("usp_ResetPassword", parameters, CommandType.StoredProcedure);
         }
     }
 }

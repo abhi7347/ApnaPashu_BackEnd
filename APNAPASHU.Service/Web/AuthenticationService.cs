@@ -3,12 +3,7 @@ using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Authentication;
 using APNAPASHU.RepositoryContract.Web;
 using APNAPASHU.ServiceContract.Web;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using System;
 using System.Net;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -33,6 +28,23 @@ namespace APNAPASHU.Service.Web
 
         public async Task<JsonModel<SqlResponseModel>> RegisterAsync(RegisterRequestModel model)
         {
+            var encryptionKey = Configuration.GetSection("JwtSettings")["EncryptionKey"] ?? string.Empty;
+            var decryptedPassword = string.Empty;
+            try
+            {
+                decryptedPassword = EncryptionDecryption.Decrypt(model.Password, encryptionKey);
+            }
+            catch
+            {
+                // Decryption failed, might be a raw password from Swagger/testing
+            }
+
+            if (string.IsNullOrEmpty(decryptedPassword))
+            {
+                decryptedPassword = model.Password; // fallback to raw
+            }
+            model.Password = decryptedPassword;
+
             model.Password = EncryptionDecryption.CreateHash(model.Password);
 
             var result = await _authenticationRepository.RegisterAsync(model);
@@ -108,27 +120,46 @@ namespace APNAPASHU.Service.Web
             }
         }
 
-        public async Task<JsonModel<LoginResponseModel>> LoginUserAsync(string email, string password)
+        public async Task<JsonModel<LoginResponseModel>> LoginUserAsync(string email, string encryptedPassword)
         {
+            var encryptionKey = Configuration.GetSection("JwtSettings")["EncryptionKey"] ?? string.Empty;
+            var decryptedPassword = string.Empty;
+            try
+            {
+                decryptedPassword = EncryptionDecryption.Decrypt(encryptedPassword, encryptionKey);
+            }
+            catch
+            {
+                // Decryption failed, might be a raw password from Swagger/testing
+            }
 
-            var user = await _authenticationRepository.LoginUserAsync(email, password);
+            // Fallback to raw password if decryption resulted in empty/null
+            if (string.IsNullOrEmpty(decryptedPassword))
+            {
+                decryptedPassword = encryptedPassword;
+            }
+
+            var user = await _authenticationRepository.LoginUserAsync(email, decryptedPassword);
 
             if (user == null)
             {
                 return new JsonModel<LoginResponseModel>
                 {
                     Data = null,
-                    Message = "Service error: Login failed",
-                    StatusCode = (int)HttpStatusCode.InternalServerError
+                    Message = "Invalid email or password",
+                    StatusCode = (int)HttpStatusCode.Unauthorized
                 };
             }
 
-            // Check if the SP returned Success
-            if (user.StatusCode == "SUCCESS")
+            // The SP returns the user's current hash in user.PasswordHash
+            bool isValid = EncryptionDecryption.ValidatePassword(decryptedPassword, user.PasswordHash);
+
+            if (isValid && user.StatusCode == "SUCCESS")
             {
+
                 // Generate JWT Token
                 user.Token = GenerateJwtToken(user);
-                
+
                 // Clear password hash from response for security
                 user.PasswordHash = string.Empty;
 
@@ -140,11 +171,10 @@ namespace APNAPASHU.Service.Web
                 };
             }
 
-            // Return SP's error message (e.g., "User not found" or "Invalid credentials")
             return new JsonModel<LoginResponseModel>
             {
                 Data = null,
-                Message = user.Message,
+                Message = "Invalid credentials",
                 StatusCode = (int)HttpStatusCode.Unauthorized
             };
         }
@@ -166,7 +196,7 @@ namespace APNAPASHU.Service.Web
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
             };
 
             var token = new JwtSecurityToken(
@@ -178,5 +208,90 @@ namespace APNAPASHU.Service.Web
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<JsonModel<SqlResponseModel>> ForgotPasswordAsync(string email)
+        {
+            // 1. Generate 6-digit OTP Token
+            Random random = new Random();
+            string token = random.Next(100000, 999999).ToString();
+
+            // 2. Call Repo to save token
+            var result = await _authenticationRepository.ForgotPasswordAsync(email, token);
+
+            if (result != null && result.StatusCode == "SUCCESS")
+            {
+                // 3. Send Email
+                string htmlTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplate/ForgotPasswordTemplate.html");
+                if (File.Exists(htmlTemplatePath))
+                {
+                    string emailString = await System.IO.File.ReadAllTextAsync(htmlTemplatePath);
+                    
+                    // Dynamically build the reset link based on the request origin (e.g. localhost vs production domain)
+                    var request = HttpContextAccessor.HttpContext?.Request;
+                    var origin = request?.Headers["Origin"].FirstOrDefault() ?? $"{request?.Scheme}://{request?.Host}";
+                    string resetLink = $"{origin}/reset-password?email={System.Net.WebUtility.UrlEncode(email)}";
+
+                    emailString = emailString.Replace("#ResetLink", resetLink);
+                    emailString = emailString.Replace("#Email", email);
+                    emailString = emailString.Replace("#Token", token);
+                    emailString = emailString.Replace("#CopyrightYear", DateTime.Now.Year.ToString());
+
+                    EmailModel emailModel = new EmailModel()
+                    {
+                        Body = emailString,
+                        To = email,
+                        Subject = "ApnaPashu - Password Reset Request"
+                    };
+
+                    bool emailSent = await SendEmailAsync(emailModel);
+                    if (!emailSent)
+                    {
+                        return new JsonModel<SqlResponseModel> { Data = null, Message = "Token generated but failed to send email.", StatusCode = (int)HttpStatusCode.InternalServerError };
+                    }
+                }
+
+                return new JsonModel<SqlResponseModel>
+                {
+                    Data = result,
+                    Message = result.Message,
+                    StatusCode = (int)HttpStatusCode.OK
+                };
+            }
+
+            return new JsonModel<SqlResponseModel>
+            {
+                Data = result,
+                Message = result?.Message,
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
+        }
+
+        public async Task<JsonModel<SqlResponseModel>> ResetPasswordAsync(string email, string token, string newPassword)
+        {
+            // 1. Hash the new password using existing methodology
+            string newPasswordHash = EncryptionDecryption.CreateHash(newPassword);
+
+            // 2. Pass hash to Repository
+            var result = await _authenticationRepository.ResetPasswordAsync(email, token, newPasswordHash);
+
+            if (result != null && result.StatusCode == "SUCCESS")
+            {
+                return new JsonModel<SqlResponseModel>
+                {
+                    Data = result,
+                    Message = result.Message,
+                    StatusCode = (int)HttpStatusCode.OK
+                };
+            }
+
+            return new JsonModel<SqlResponseModel>
+            {
+                Data = null,
+                Message = result?.Message,
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
+        }
+        
     }
 }
+

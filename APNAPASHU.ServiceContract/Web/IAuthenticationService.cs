@@ -7,5 +7,7 @@ namespace APNAPASHU.ServiceContract.Web
     {
         Task<JsonModel<SqlResponseModel>> RegisterAsync(RegisterRequestModel model);
         Task<JsonModel<LoginResponseModel>> LoginUserAsync(string email, string password);
+        Task<JsonModel<SqlResponseModel>> ForgotPasswordAsync(string email);
+        Task<JsonModel<SqlResponseModel>> ResetPasswordAsync(string email, string token, string newPassword);
     }
 }

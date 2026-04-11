@@ -8,7 +8,7 @@ namespace APNAPASHU.DataContract.Models
 
         public JsonModel() { }
 
-        public JsonModel(object? data, string? message, int? statusCode, string? appError = "")
+        public JsonModel(T? data, string? message, int? statusCode, string? appError = "")
         {
             Data = data;
             Message = message;
@@ -17,7 +17,7 @@ namespace APNAPASHU.DataContract.Models
         }
 
         public string? AppError { get; set; }
-        public object? Data { get; set; }
+        public T? Data { get; set; }
         public string? Message { get; set; }
         public int? StatusCode { get; set; }
         public string? AccessToken { get; set; }

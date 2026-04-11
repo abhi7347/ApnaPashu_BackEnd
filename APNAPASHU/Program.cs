@@ -11,74 +11,27 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
-builder.Services.AddLogging(config =>
-{
-    config.ClearProviders();
-    config.AddConsole();
-    config.AddDebug();
-});
 
-// Add controllers with global exception filter
+// Add controllers with global exception filter and camelCase JSON
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ApiExceptionFilterAttribute>();
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
 // Add API Explorer
 builder.Services.AddEndpointsApiExplorer();
 
 // Add Swagger
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "APNAPASHU API", 
-        Version = "v1.0.0",
-        Description = "API for APNAPASHU platform with Web and Mobile support",
-        Contact = new OpenApiContact 
-        { 
-            Name = "APNAPASHU Support", 
-            Email = "support@apnapashu.com" 
-        }
-    });
-
-    // Add JWT bearer token support to Swagger
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please insert JWT with Bearer into field",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] { }
-        }
-    });
-});
+builder.Services.AddSwaggerGen();
 
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
 
     options.AddPolicy("AllowSpecific", policy =>
     {
@@ -138,11 +91,10 @@ if (app.Environment.IsDevelopment())
 app.UseErrorHandlingMiddleware();
 
 app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
 // Use CORS
 app.UseCors("AllowSpecific");
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
