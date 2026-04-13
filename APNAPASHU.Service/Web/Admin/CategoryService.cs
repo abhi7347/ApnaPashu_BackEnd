@@ -1,12 +1,12 @@
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.RepositoryContract.Web;
-using APNAPASHU.ServiceContract.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
-using APNAPASHU.DataContract.Models.Web.Categories;
 using APNAPASHU.Common.Messages;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
+using APNAPASHU.RepositoryContract.Web.Admin;
+using APNAPASHU.ServiceContract.Web.Admin;
 
-namespace APNAPASHU.Service.Web
+namespace APNAPASHU.Service.Web.Admin
 {
     /// <summary>
     /// Category Service Implementation for Web - CRUD Template

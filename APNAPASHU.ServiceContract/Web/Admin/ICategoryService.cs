@@ -1,7 +1,7 @@
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.DataContract.Models.Web.Categories;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 
-namespace APNAPASHU.ServiceContract.Web
+namespace APNAPASHU.ServiceContract.Web.Admin
 {
     /// <summary>
     /// Category Service Interface for Web - CRUD Template

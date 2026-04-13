@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.ServiceContract.Web;
-using APNAPASHU.DataContract.Models.Web.Categories;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
+using APNAPASHU.ServiceContract.Web.Admin;
 
-namespace APNAPASHU.API.Controllers.Web
+namespace APNAPASHU.API.Controllers.Web.Admin
 {
     [Route("api/[controller]")]
     [ApiController]

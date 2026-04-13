@@ -1,7 +1,7 @@
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.DataContract.Models.Web.Categories;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 
-namespace APNAPASHU.RepositoryContract.Web
+namespace APNAPASHU.RepositoryContract.Web.Admin
 {
     /// <summary>
     /// Category Repository Interface for Web - CRUD Template

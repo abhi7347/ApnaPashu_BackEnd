@@ -1,4 +1,4 @@
-﻿namespace APNAPASHU.DataContract.Entity
+﻿namespace APNAPASHU.DataContract.Entity.Admin
 {
     public class Categories: BaseEntity
     {

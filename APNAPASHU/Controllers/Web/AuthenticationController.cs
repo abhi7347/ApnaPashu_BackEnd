@@ -53,7 +53,7 @@ namespace APNAPASHU.API.Controllers.Web
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = true, // Required for SameSite=None cross-origin fetch
                     SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddHours(1)
                 };
@@ -93,11 +93,40 @@ namespace APNAPASHU.API.Controllers.Web
                 HttpOnly = true,
                 Secure = true,
                 SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddSeconds(-1) // Expire the cookie immediately
+                Expires = DateTime.UtcNow.AddSeconds(-1)
             };
             Response.Cookies.Append("AuthToken", "", cookieOptions);
-            
             return Ok(new JsonModel<object>(null, "Logged out successfully", 200));
+        }
+
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(JsonModel<object>), 200)]
+        public IActionResult GetCurrentUser()
+        {
+            var cookieTokenString = Request.Cookies["AuthToken"];
+            var hasAuthToken = !string.IsNullOrEmpty(cookieTokenString);
+            
+            // Log manually what the Identity principal thinks
+            var isAuth = User.Identity?.IsAuthenticated == true;
+            var userId = GetAuthenticatedUserId();
+
+            if (!isAuth || userId == 0) 
+            {
+                var debugPayload = new { 
+                    message = "Debug Validation Failed", 
+                    cookieAttached = hasAuthToken, 
+                    isAuthorizedByMiddleware = isAuth,
+                    userIdExtracted = userId,
+                    nameIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "NULL"
+                };
+                return StatusCode(401, new JsonModel<object>(debugPayload, "Development API Rejected Session", 401));
+            }
+
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+            var data = new { UserId = userId, Email = email, Role = role };
+            return Ok(new JsonModel<object>(data, "Success", 200));
         }
     }
 }

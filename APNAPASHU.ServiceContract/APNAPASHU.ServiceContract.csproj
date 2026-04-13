@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Mobile\" />
+    <Folder Include="Web\Buyer\" />
   </ItemGroup>
 
 </Project>

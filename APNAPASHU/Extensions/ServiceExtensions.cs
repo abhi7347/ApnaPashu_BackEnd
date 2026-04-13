@@ -1,10 +1,18 @@
 using APNAPASHU.Repository;
 using APNAPASHU.Repository.Web;
+using APNAPASHU.Repository.Web.Admin;
+using APNAPASHU.Repository.Web.Seller;
 using APNAPASHU.RepositoryContract;
 using APNAPASHU.RepositoryContract.Web;
+using APNAPASHU.RepositoryContract.Web.Admin;
+using APNAPASHU.RepositoryContract.Web.Seller;
 using APNAPASHU.Service.Web;
+using APNAPASHU.Service.Web.Admin;
+using APNAPASHU.Service.Web.Seller;
 using APNAPASHU.ServiceContract;
 using APNAPASHU.ServiceContract.Web;
+using APNAPASHU.ServiceContract.Web.Admin;
+using APNAPASHU.ServiceContract.Web.Seller;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace APNAPASHU.API.Extensions
@@ -22,6 +30,9 @@ namespace APNAPASHU.API.Extensions
 
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+            services.AddScoped<IPostedAnimalRepository, PostedAnimalRepository>();
+            services.AddScoped<IPostedAnimalService, PostedAnimalService>();
 
 
             // Mobile APIs

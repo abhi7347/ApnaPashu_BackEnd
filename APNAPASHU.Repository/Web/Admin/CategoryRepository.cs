@@ -1,13 +1,13 @@
 using Dapper;
-using APNAPASHU.RepositoryContract.Web;
 using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using APNAPASHU.DataContract.Models.Web.Categories;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Enums;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
+using APNAPASHU.RepositoryContract.Web.Admin;
 
-namespace APNAPASHU.Repository.Web
+namespace APNAPASHU.Repository.Web.Admin
 {
     /// <summary>
     /// Category Repository Implementation for Web - CRUD Template

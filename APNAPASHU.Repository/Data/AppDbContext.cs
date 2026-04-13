@@ -1,4 +1,6 @@
-﻿using APNAPASHU.DataContract.Entity;
+using APNAPASHU.DataContract.Entity;
+using APNAPASHU.DataContract.Entity.Admin;
+using APNAPASHU.DataContract.Entity.Seller;
 using Microsoft.EntityFrameworkCore;
 
 namespace APNAPASHU.Repository.Data
@@ -11,8 +13,8 @@ namespace APNAPASHU.Repository.Data
         }
 
         public DbSet<Categories> Categories { get; set; }
-
         public DbSet<Roles> Roles { get; set; }
-
+        public DbSet<PostedAnimal> PostedAnimals { get; set; }
+        public DbSet<PostedAnimalImage> PostedAnimalImages { get; set; }
     }
 }

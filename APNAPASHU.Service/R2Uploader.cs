@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Minio;
 using Minio.DataModel.Args;
 
@@ -24,7 +24,7 @@ namespace APNAPASHU.Service
         // ==========================================
         // UPLOAD MULTIPLE FILES
         // ==========================================
-        public async Task<List<string>> UploadFilesAsync(List<IFormFile> files, string folderName)
+        public async Task UploadFilesAsync(List<IFormFile> files, List<string> fileNames, string folderName)
         {
             if (files == null || !files.Any())
                 throw new ArgumentException("Files are required");
@@ -32,10 +32,12 @@ namespace APNAPASHU.Service
             if (string.IsNullOrWhiteSpace(folderName))
                 throw new ArgumentException("Folder name is required");
 
-            var tasks = files.Select(async file =>
+            if (files.Count != fileNames.Count)
+                throw new ArgumentException("Files and fileNames count mismatch");
+
+            var tasks = files.Select(async (file, index) =>
             {
-                var ext = Path.GetExtension(file.FileName);
-                var fileName = $"{Guid.NewGuid()}{ext}";
+                var fileName = fileNames[index]; // use provided name
                 var objectKey = $"{folderName}/{fileName}";
 
                 using var stream = file.OpenReadStream();
@@ -45,15 +47,14 @@ namespace APNAPASHU.Service
                     .WithObject(objectKey)
                     .WithStreamData(stream)
                     .WithObjectSize(stream.Length)
-                    .WithContentType(GetContentType(ext));
+                    .WithContentType(file.ContentType);
 
                 await _minio.PutObjectAsync(putObjectArgs);
-
-                return fileName;
             });
 
-            return (await Task.WhenAll(tasks)).ToList();
+            await Task.WhenAll(tasks);
         }
+
 
         // ==========================================
         // GET MULTIPLE FILE URLS (SECURE)
@@ -98,6 +99,50 @@ namespace APNAPASHU.Service
             });
 
             await Task.WhenAll(tasks);
+        }
+
+        // ==========================================
+        // DELETE ENTIRE FOLDER (BY PREFIX)
+        // ==========================================
+        public async Task DeleteFolderAsync(string folderName)
+        {
+            if (string.IsNullOrWhiteSpace(folderName))
+                return;
+
+            // Ensure prefix ends with / to strictly target the directory contents
+            var prefix = folderName.EndsWith("/") ? folderName : $"{folderName}/";
+
+            var listArgs = new ListObjectsArgs()
+                .WithBucket(_bucket)
+                .WithPrefix(prefix)
+                .WithRecursive(true);
+
+            // Minio client returns IObservable<Item> for listing
+            var deleteList = new List<string>();
+            var tcs = new TaskCompletionSource<bool>();
+
+            using (var subscription = _minio.ListObjectsAsync(listArgs).Subscribe(
+                item => {
+                    if (!string.IsNullOrEmpty(item.Key))
+                    {
+                        deleteList.Add(item.Key);
+                    }
+                },
+                ex => tcs.SetException(ex),
+                () => tcs.SetResult(true)
+            ))
+            {
+                await tcs.Task;
+            }
+
+            if (deleteList.Any())
+            {
+                var removeArgs = new RemoveObjectsArgs()
+                    .WithBucket(_bucket)
+                    .WithObjects(deleteList);
+
+                await _minio.RemoveObjectsAsync(removeArgs);
+            }
         }
 
         // ==========================================

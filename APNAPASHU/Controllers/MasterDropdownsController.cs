@@ -1,7 +1,7 @@
-using APNAPASHU.DataContract.Models.Web.Categories;
 using APNAPASHU.DataContract.Models;
 using Microsoft.AspNetCore.Mvc;
 using APNAPASHU.ServiceContract;
+using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 
 namespace APNAPASHU.API.Controllers
 {

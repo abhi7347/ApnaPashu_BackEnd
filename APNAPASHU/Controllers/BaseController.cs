@@ -48,7 +48,7 @@ namespace APNAPASHU.API.Controllers
         /// </summary>
         protected int GetAuthenticatedUserId()
         {
-            var userIdClaim = User.FindFirst("UserId");
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
             if (int.TryParse(userIdClaim?.Value, out int userId))
                 return userId;
             return 0;
