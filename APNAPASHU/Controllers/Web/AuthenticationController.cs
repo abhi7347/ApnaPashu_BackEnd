@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.ServiceContract.Web;
 using APNAPASHU.DataContract.Models.Web.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace APNAPASHU.API.Controllers.Web
 {
@@ -53,9 +54,9 @@ namespace APNAPASHU.API.Controllers.Web
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Required for SameSite=None cross-origin fetch
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddHours(1)
+                    Secure = true, // Required for SameSite=None
+                    SameSite = SameSiteMode.None, // Required for Cross-Scheme AJAX (http to https)
+                    Expires = DateTime.UtcNow.AddDays(7)
                 };
                 Response.Cookies.Append("AuthToken", result.Data.Token, cookieOptions);
             }
@@ -92,41 +93,53 @@ namespace APNAPASHU.API.Controllers.Web
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddSeconds(-1)
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(-1)
             };
             Response.Cookies.Append("AuthToken", "", cookieOptions);
             return Ok(new JsonModel<object>(null, "Logged out successfully", 200));
         }
 
+        [Authorize]
         [HttpGet("me")]
-        [ProducesResponseType(typeof(JsonModel<object>), 200)]
-        public IActionResult GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var cookieTokenString = Request.Cookies["AuthToken"];
-            var hasAuthToken = !string.IsNullOrEmpty(cookieTokenString);
-            
-            // Log manually what the Identity principal thinks
-            var isAuth = User.Identity?.IsAuthenticated == true;
             var userId = GetAuthenticatedUserId();
-
-            if (!isAuth || userId == 0) 
+            if (userId == 0) 
             {
-                var debugPayload = new { 
-                    message = "Debug Validation Failed", 
-                    cookieAttached = hasAuthToken, 
-                    isAuthorizedByMiddleware = isAuth,
-                    userIdExtracted = userId,
-                    nameIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "NULL"
-                };
-                return StatusCode(401, new JsonModel<object>(debugPayload, "Development API Rejected Session", 401));
+                return Unauthorized(new JsonModel<object>(null, "Unauthorized", 401));
             }
 
-            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var result = await _authenticationService.GetUserProfileAsync(userId);
+            return Ok(result);
+        }
 
-            var data = new { UserId = userId, Email = email, Role = role };
-            return Ok(new JsonModel<object>(data, "Success", 200));
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel model)
+        {
+            var userId = GetAuthenticatedUserId();
+            if (userId == 0)
+            {
+                return Unauthorized(new JsonModel<object>(null, "Unauthorized", 401));
+            }
+
+            var result = await _authenticationService.ChangePasswordAsync(model, userId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequestModel model)
+        {
+            var userId = GetAuthenticatedUserId();
+            if (userId == 0)
+            {
+                return Unauthorized(new JsonModel<object>(null, "User session expired or invalid", 401));
+            }
+
+            var result = await _authenticationService.UpdateProfileAsync(model, userId);
+            return Ok(result);
         }
     }
 }

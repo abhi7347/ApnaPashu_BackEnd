@@ -54,5 +54,35 @@ namespace APNAPASHU.Repository.Web
 
             return await GetQuerySingleOrDefaultAsync<SqlResponseModel>("usp_ResetPassword", parameters, CommandType.StoredProcedure);
         }
+        public async Task<LoginResponseModel> GetUserByIdAsync(int userId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+            return await GetQuerySingleOrDefaultAsync<LoginResponseModel>("usp_GetUserById", parameters, CommandType.StoredProcedure);
+        }
+
+        public async Task<SqlResponseModel> UpdateProfileAsync(UpdateProfileRequestModel model, int userId, string? passwordHash, string? profileImage)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+            parameters.Add("@FirstName", model.FirstName);
+            parameters.Add("@LastName", model.LastName);
+            parameters.Add("@Email", model.Email);
+            parameters.Add("@Phone", model.Phone);
+            parameters.Add("@Address", model.Address);
+            parameters.Add("@PasswordHash", passwordHash);
+            parameters.Add("@ProfileImage", profileImage);
+
+            return await GetQuerySingleOrDefaultAsync<SqlResponseModel>("usp_UpdateUserProfile", parameters, CommandType.StoredProcedure);
+        }
+
+        public async Task<SqlResponseModel> ChangePasswordAsync(int userId, string newPasswordHash)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+            parameters.Add("@NewPasswordHash", newPasswordHash);
+
+            return await GetQuerySingleOrDefaultAsync<SqlResponseModel>("usp_ChangeUserPassword", parameters, CommandType.StoredProcedure);
+        }
     }
 }

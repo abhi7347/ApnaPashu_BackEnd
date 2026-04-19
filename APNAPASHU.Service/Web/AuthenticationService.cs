@@ -160,6 +160,13 @@ namespace APNAPASHU.Service.Web
                 // Generate JWT Token
                 user.Token = GenerateJwtToken(user);
 
+                // Generate signed URL for Profile Image if exists
+                if (!string.IsNullOrEmpty(user.ProfileImage))
+                {
+                    var imageUrls = await _uploader.GetFileUrlsAsync(new List<string> { user.ProfileImage }, $"users/{user.UserId}");
+                    user.Image = imageUrls.FirstOrDefault();
+                }
+
                 // Clear password hash from response for security
                 user.PasswordHash = string.Empty;
 
@@ -203,7 +210,7 @@ namespace APNAPASHU.Service.Web
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(expiryMinutes),
+                expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -292,6 +299,118 @@ namespace APNAPASHU.Service.Web
             };
         }
         
+        public async Task<JsonModel<LoginResponseModel>> UpdateProfileAsync(UpdateProfileRequestModel model, int userId)
+        {
+            try
+            {
+                string? passwordHash = null;
+                if (!string.IsNullOrEmpty(model.NewPassword))
+                {
+                    passwordHash = EncryptionDecryption.CreateHash(model.NewPassword);
+                }
+
+                string? imagePath = null;
+                if (model.Image != null)
+                {
+                    var extension = Path.GetExtension(model.Image.FileName);
+                    imagePath = $"{Guid.NewGuid()}{extension}";
+                }
+
+                // 1. Update Profile in DB (Returns SqlResponseModel)
+                var result = await _authenticationRepository.UpdateProfileAsync(model, userId, passwordHash, imagePath);
+
+                if (result == null || result.StatusCode != "SUCCESS")
+                {
+                    return new JsonModel<LoginResponseModel>(null, result?.Message ?? "Failed to update profile", (int)HttpStatusCode.BadRequest);
+                }
+
+                // 2. Fetch updated user details to hydrate the response
+                var updatedUser = await _authenticationRepository.GetUserByIdAsync(userId);
+                if (updatedUser == null)
+                {
+                    return new JsonModel<LoginResponseModel>(null, "Profile updated but failed to load fresh data", (int)HttpStatusCode.PartialContent);
+                }
+
+                // 3. Physical Upload to R2 only if DB update was successful and image was provided
+                if (model.Image != null && imagePath != null)
+                {
+                    await _uploader.UploadFilesAsync(
+                        new List<IFormFile> { model.Image },
+                        new List<string> { imagePath },
+                        $"users/{userId}"
+                    );
+                }
+
+                // 4. Generate signed URL for Image if exists
+                if (!string.IsNullOrEmpty(updatedUser.ProfileImage))
+                {
+                    var imageUrls = await _uploader.GetFileUrlsAsync(new List<string> { updatedUser.ProfileImage }, $"users/{userId}");
+                    updatedUser.Image = imageUrls.FirstOrDefault();
+                }
+                
+                updatedUser.PasswordHash = string.Empty;
+                return new JsonModel<LoginResponseModel>(updatedUser, result.Message ?? "Profile updated successfully", (int)HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return new JsonModel<LoginResponseModel>(null, $"Error: {ex.Message}", (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<JsonModel<LoginResponseModel>> GetUserProfileAsync(int userId)
+        {
+            try
+            {
+                var user = await _authenticationRepository.GetUserByIdAsync(userId);
+                if (user != null)
+                {
+                    if (!string.IsNullOrEmpty(user.ProfileImage))
+                    {
+                        var imageUrls = await _uploader.GetFileUrlsAsync(new List<string> { user.ProfileImage }, $"users/{userId}");
+                        user.Image = imageUrls.FirstOrDefault();
+                    }
+                    user.PasswordHash = string.Empty;
+                    return new JsonModel<LoginResponseModel>(user, "Profile fetched successfully", (int)HttpStatusCode.OK);
+                }
+                return new JsonModel<LoginResponseModel>(null, "User not found", (int)HttpStatusCode.NotFound);
+            }
+            catch (Exception ex)
+            {
+                return new JsonModel<LoginResponseModel>(null, $"Error: {ex.Message}", (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        public async Task<JsonModel<SqlResponseModel>> ChangePasswordAsync(ChangePasswordRequestModel model, int userId)
+        {
+            try
+            {
+                // 1. Fetch user to get current hash
+                var user = await _authenticationRepository.GetUserByIdAsync(userId);
+                if (user == null)
+                {
+                    return new JsonModel<SqlResponseModel>(null, "User not found", (int)HttpStatusCode.NotFound);
+                }
+
+                // 2. Verify current password
+                bool isCorrect = EncryptionDecryption.ValidatePassword(model.CurrentPassword, user.PasswordHash);
+                if (!isCorrect)
+                {
+                    return new JsonModel<SqlResponseModel>(null, "Incorrect current password", (int)HttpStatusCode.BadRequest);
+                }
+
+                // 3. Hash new password
+                string newHash = EncryptionDecryption.CreateHash(model.NewPassword);
+
+                // 4. Update in DB
+                var result = await _authenticationRepository.ChangePasswordAsync(userId, newHash);
+                
+                return new JsonModel<SqlResponseModel>(result, result?.Message ?? "Password updated successfully", 
+                    (result?.StatusCode == "SUCCESS" ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest));
+            }
+            catch (Exception ex)
+            {
+                return new JsonModel<SqlResponseModel>(null, $"Error: {ex.Message}", (int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
 
