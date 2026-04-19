@@ -16,5 +16,9 @@ namespace APNAPASHU.DataContract.Models.Web.Seller.PostedAnimal
         public List<IFormFile>? NewImages { get; set; }
         public List<string>? ExistingImages { get; set; }
         public List<string>? ImageNames { get; set; }
+
+        public bool IsFeatured { get; set; }
+        public DateTime? FeaturedTill { get; set; }
+
     }
 }

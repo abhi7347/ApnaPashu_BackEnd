@@ -94,6 +94,9 @@ namespace APNAPASHU.Repository.Web.Seller
                 ? System.Text.Json.JsonSerializer.Serialize(model.ImageNames)
                 : null);
 
+            parameters.Add("@IsFeatured", model.IsFeatured);
+            parameters.Add("@FeaturedTill", model.FeaturedTill);
+
             parameters.Add("@UserId", userId);
 
             return await AddAsync<SqlResponseModel>(
@@ -120,6 +123,21 @@ namespace APNAPASHU.Repository.Web.Seller
                 CommandType.StoredProcedure,
                 DataBaseNameEnum.APNAPASHU
             );
+        }
+
+        public async Task<int> UpdateSoldStatusAsync(int id, bool isSold, int userId)
+        {
+            var animal = await _context.PostedAnimals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+            if (animal != null)
+            {
+                animal.IsSold = isSold;
+                animal.SoldDate = isSold ? DateTime.Now : null;
+                animal.UpdatedBy = userId;
+                animal.UpdatedDate = DateTime.Now;
+
+                return await _context.SaveChangesAsync();
+            }
+            return 0;
         }
     }
 }

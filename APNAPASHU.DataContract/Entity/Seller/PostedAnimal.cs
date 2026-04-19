@@ -16,6 +16,10 @@ namespace APNAPASHU.DataContract.Entity.Seller
         public string? Location { get; set; }
         public string? Description { get; set; }
         public int UserId { get; set; }
+        public bool? IsFeatured { get; set; }
+        public DateTime? FeaturedTill { get; set; }
+        public bool? IsSold { get; set; }
+        public DateTime? SoldDate { get; set; }
         
         public virtual ICollection<PostedAnimalImage> Images { get; set; } = new List<PostedAnimalImage>();
     }

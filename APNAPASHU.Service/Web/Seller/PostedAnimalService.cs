@@ -13,11 +13,17 @@ namespace APNAPASHU.Service.Web.Seller
     public class PostedAnimalService : BaseService, IPostedAnimalService
     {
         private readonly IPostedAnimalRepository _repository;
+        private readonly IAnimalPromotionRepository _promotionRepository;
 
-        public PostedAnimalService(IPostedAnimalRepository repository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public PostedAnimalService(
+            IPostedAnimalRepository repository, 
+            IAnimalPromotionRepository promotionRepository,
+            IHttpContextAccessor httpContextAccessor, 
+            IConfiguration configuration)
             : base(httpContextAccessor, configuration)
         {
             _repository = repository;
+            _promotionRepository = promotionRepository;
         }
 
         public async Task<JsonModel<List<PostedAnimalResponseModel>>> GetAllAsync(FilterDto filterDto, int userId)
@@ -226,6 +232,46 @@ namespace APNAPASHU.Service.Web.Seller
                 result,
                 result.Message,
                 result.StatusCode == "SUCCESS" ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest
+            );
+        }
+
+        public async Task<JsonModel<object>> AddPromotionAsync(AnimalPromotionUpsertModel model, int userId)
+        {
+            var result = await _promotionRepository.AddPromotionAsync(model, userId);
+            return new JsonModel<object>(
+                result,
+                result.Message,
+                result.StatusCode == "SUCCESS" ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest
+            );
+        }
+
+        public async Task<JsonModel<List<AnimalPromotionResponseModel>>> GetPromotionHistoryAsync(int animalId)
+        {
+            var data = await _promotionRepository.GetPromotionHistoryAsync(animalId);
+            return new JsonModel<List<AnimalPromotionResponseModel>>(
+                data,
+                ResponseMessages.fetchedSuccessfully,
+                (int)HttpStatusCode.OK
+            );
+        }
+
+        public async Task<JsonModel<object>> UpdateSoldStatusAsync(int id, bool isSold, int userId)
+        {
+            var resultCount = await _repository.UpdateSoldStatusAsync(id, isSold, userId);
+            
+            if (resultCount > 0)
+            {
+                return new JsonModel<object>(
+                    null,
+                    isSold ? "Animal marked as sold" : "Animal marked as available",
+                    (int)HttpStatusCode.OK
+                );
+            }
+
+            return new JsonModel<object>(
+                null,
+                "Animal not found or you don't have permission",
+                (int)HttpStatusCode.BadRequest
             );
         }
     }

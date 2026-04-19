@@ -10,5 +10,6 @@ namespace APNAPASHU.RepositoryContract.Web.Seller
         Task<List<PostedAnimalResponseModel>> GetByIdsAsync(List<int> ids);
         Task<SqlResponseModel> UpsertAsync(PostedAnimalUpsertModel model, int userId);
         Task<SqlResponseModel> DeleteAsync(List<int> ids, int userId);
+        Task<int> UpdateSoldStatusAsync(int id, bool isSold, int userId);
     }
 }

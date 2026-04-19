@@ -16,5 +16,9 @@ namespace APNAPASHU.DataContract.Models.Web.Seller.PostedAnimal
         public string? ImagesJson { get; set; } // raw JSON from DB (usp_GetPostedAnimalById & usp_GetAllPostedAnimals)
         public List<string>? Images { get; set; } // processed full URLs for frontend
         public string? ImageUrl { get; set; } // primary image for list display
+        public bool IsFeatured { get; set; }
+        public DateTime? FeaturedTill { get; set; }
+        public bool IsSold { get; set; }
+        public DateTime? SoldDate { get; set; }
     }
 }

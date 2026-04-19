@@ -17,10 +17,10 @@ namespace APNAPASHU.Repository
         public async Task<List<MasterDropdownsModels>> GetCategoriesDropDowns()
         {
             return await _context.Categories
-                .Where(x => x.IsActive && !x.IsDeleted)
+                .Where(x => (x.IsActive ?? true) && !(x.IsDeleted ?? false))
                 .Select(x => new MasterDropdownsModels
                 {
-                    Id = x.Id,
+                    Id = x.Id ?? 0,
                     Name = x.CategoryName
                 })
                 .ToListAsync();
@@ -29,10 +29,10 @@ namespace APNAPASHU.Repository
         public async Task<List<MasterDropdownsModels>> GetRolesDropDowns()
         {
             return await _context.Roles
-                .Where(x => x.IsActive && !x.IsDeleted)
+                .Where(x => (x.IsActive ?? true) && !(x.IsDeleted ?? false))
                 .Select(x => new MasterDropdownsModels
                 {
-                    Id = x.Id,
+                    Id = x.Id ?? 0,
                     Name = x.RoleName
                 })
                 .ToListAsync();

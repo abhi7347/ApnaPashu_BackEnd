@@ -33,6 +33,7 @@ namespace APNAPASHU.API.Extensions
 
             services.AddScoped<IPostedAnimalRepository, PostedAnimalRepository>();
             services.AddScoped<IPostedAnimalService, PostedAnimalService>();
+            services.AddScoped<IAnimalPromotionRepository, AnimalPromotionRepository>();
 
 
             // Mobile APIs

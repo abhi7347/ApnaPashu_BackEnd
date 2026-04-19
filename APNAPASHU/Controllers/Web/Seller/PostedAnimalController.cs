@@ -66,5 +66,31 @@ namespace APNAPASHU.API.Controllers.Web.Seller
             var result = await _service.DeleteAsync(ids, userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
+
+        [HttpPost("add-promotion")]
+        [ProducesResponseType(typeof(JsonModel<object>), 200)]
+        public async Task<IActionResult> AddPromotion([FromBody] AnimalPromotionUpsertModel model)
+        {
+            int userId = GetAuthenticatedUserId();
+            var result = await _service.AddPromotionAsync(model, userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
+        }
+
+        [HttpGet("promotion-history/{animalId}")]
+        [ProducesResponseType(typeof(JsonModel<List<AnimalPromotionResponseModel>>), 200)]
+        public async Task<IActionResult> GetPromotionHistory(int animalId)
+        {
+            var result = await _service.GetPromotionHistoryAsync(animalId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
+
+        [HttpPost("update-sold-status/{id}")]
+        [ProducesResponseType(typeof(JsonModel<object>), 200)]
+        public async Task<IActionResult> UpdateSoldStatus(int id, [FromQuery] bool isSold)
+        {
+            int userId = GetAuthenticatedUserId();
+            var result = await _service.UpdateSoldStatusAsync(id, isSold, userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
+        }
     }
 }
