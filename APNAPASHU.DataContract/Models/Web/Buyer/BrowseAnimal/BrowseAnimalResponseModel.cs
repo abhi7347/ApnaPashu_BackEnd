@@ -1,15 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace APNAPASHU.DataContract.Entity.Seller
+namespace APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal
 {
-    [Table("PostedAnimals")]
-    public class PostedAnimal: BaseEntity
+    public class BrowseAnimalResponseModel
     {
-        [Key]
         public int Id { get; set; }
         public string? Name { get; set; }
         public int CategoryId { get; set; }
+        public string? CategoryName { get; set; }
         public string? Breed { get; set; }
         public int? AgeInMonths { get; set; }
         public int? GenderId { get; set; }
@@ -17,11 +13,14 @@ namespace APNAPASHU.DataContract.Entity.Seller
         public string? Location { get; set; }
         public string? Description { get; set; }
         public int UserId { get; set; }
-        public bool? IsFeatured { get; set; }
+        public bool IsFeatured { get; set; }
         public DateTime? FeaturedTill { get; set; }
-        public bool? IsSold { get; set; }
-        public DateTime? SoldDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         
-        public virtual ICollection<PostedAnimalImage> Images { get; set; } = new List<PostedAnimalImage>();
+        public string? ImagesJson { get; set; } 
+        public List<string>? Images { get; set; } 
+        public string? ImageUrl { get; set; } 
+
+        public int TotalRecords { get; set; }
     }
 }

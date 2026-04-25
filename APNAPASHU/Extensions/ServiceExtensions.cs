@@ -13,6 +13,10 @@ using APNAPASHU.ServiceContract;
 using APNAPASHU.ServiceContract.Web;
 using APNAPASHU.ServiceContract.Web.Admin;
 using APNAPASHU.ServiceContract.Web.Seller;
+using APNAPASHU.Repository.Web.Buyer;
+using APNAPASHU.RepositoryContract.Web.Buyer;
+using APNAPASHU.Service.Web.Buyer;
+using APNAPASHU.ServiceContract.Web.Buyer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace APNAPASHU.API.Extensions
@@ -34,6 +38,9 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IPostedAnimalRepository, PostedAnimalRepository>();
             services.AddScoped<IPostedAnimalService, PostedAnimalService>();
             services.AddScoped<IAnimalPromotionRepository, AnimalPromotionRepository>();
+
+            services.AddScoped<IBrowseAnimalRepository, BrowseAnimalRepository>();
+            services.AddScoped<IBrowseAnimalService, BrowseAnimalService>();
 
 
             // Mobile APIs

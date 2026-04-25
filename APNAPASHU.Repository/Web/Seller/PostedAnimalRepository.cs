@@ -85,7 +85,8 @@ namespace APNAPASHU.Repository.Web.Seller
             parameters.Add("@Name", model.Name);
             parameters.Add("@CategoryId", model.CategoryId);
             parameters.Add("@Breed", model.Breed);
-            parameters.Add("@Age", model.Age);
+            parameters.Add("@AgeInMonths", model.AgeInMonths);
+            parameters.Add("@GenderId", model.GenderId);
             parameters.Add("@Price", model.Price);
             parameters.Add("@Location", model.Location);
             parameters.Add("@Description", model.Description);

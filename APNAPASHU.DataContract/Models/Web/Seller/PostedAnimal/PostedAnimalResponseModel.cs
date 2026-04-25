@@ -8,7 +8,8 @@ namespace APNAPASHU.DataContract.Models.Web.Seller.PostedAnimal
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public string? Breed { get; set; }
-        public string? Age { get; set; }
+        public int? AgeInMonths { get; set; }
+        public int? GenderId { get; set; }
         public decimal Price { get; set; }
         public string? Location { get; set; }
         public string? Description { get; set; }
