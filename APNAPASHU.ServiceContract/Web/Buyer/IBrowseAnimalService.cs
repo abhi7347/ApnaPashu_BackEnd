@@ -6,5 +6,7 @@ namespace APNAPASHU.ServiceContract.Web.Buyer
     public interface IBrowseAnimalService
     {
         Task<JsonModel<List<BrowseAnimalResponseModel>>> BrowseAnimalsAsync(BrowseAnimalFilterDto filter);
+        Task<JsonModel<object>> ToggleFavoritesAnimal(int animalId, int userId);
+
     }
 }

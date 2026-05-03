@@ -24,4 +24,6 @@ namespace APNAPASHU.DataContract.Entity.Seller
         
         public virtual ICollection<PostedAnimalImage> Images { get; set; } = new List<PostedAnimalImage>();
     }
+
+
 }

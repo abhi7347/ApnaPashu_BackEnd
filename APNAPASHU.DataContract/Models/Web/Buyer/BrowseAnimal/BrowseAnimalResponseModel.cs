@@ -20,6 +20,7 @@ namespace APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal
         public string? ImagesJson { get; set; } 
         public List<string>? Images { get; set; } 
         public string? ImageUrl { get; set; } 
+        public bool? IsFavorite { get; }
 
         public int TotalRecords { get; set; }
     }

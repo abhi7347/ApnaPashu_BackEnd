@@ -1,29 +1,29 @@
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal;
+using APNAPASHU.DataContract.Models.Web.Buyer.FavoriteAnimal;
 using APNAPASHU.RepositoryContract.Web.Buyer;
 using APNAPASHU.ServiceContract.Web.Buyer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using System.Net;
 using System.Text.Json;
 
 namespace APNAPASHU.Service.Web.Buyer
 {
-    public class BrowseAnimalService : BaseService, IBrowseAnimalService
+    public class FavoriteAnimalService : BaseService, IFavoriteAnimalService
     {
-        private readonly IBrowseAnimalRepository _repository;
+        private readonly IFavoriteAnimalRepository _repository;
 
-        public BrowseAnimalService(
-            IBrowseAnimalRepository repository,
+        public FavoriteAnimalService(
+            IFavoriteAnimalRepository repository,
             IHttpContextAccessor accessor,
             IConfiguration configuration) : base(accessor, configuration)
         {
             _repository = repository;
         }
 
-        public async Task<JsonModel<List<BrowseAnimalResponseModel>>> BrowseAnimalsAsync(BrowseAnimalFilterDto filter)
+        public async Task<JsonModel<List<BrowseAnimalResponseModel>>> GetFavoriteAnimalsAsync(FavoriteAnimalFilterDto filter)
         {
-            var result = await _repository.BrowseAnimalsAsync(filter);
+            var result = await _repository.GetFavoriteAnimalsAsync(filter);
             
             // Post-process the ImagesJson into full URLs
             foreach (var item in result)
@@ -55,27 +55,8 @@ namespace APNAPASHU.Service.Web.Buyer
                 }
             }
             
-            return new JsonModel<List<BrowseAnimalResponseModel>>(result, "Animals retrieved successfully.", 200);
+            return new JsonModel<List<BrowseAnimalResponseModel>>(result, "Favorite animals retrieved successfully.", 200);
         }
-
-        public async Task<JsonModel<object>> ToggleFavoritesAnimal(int animalId, int userId)
-        {
-        
-            if (animalId == 0)
-            {
-                return new JsonModel<object>(null, "No IDs provided for favorite", (int)HttpStatusCode.BadRequest);
-            }
-
-            var result = await _repository.ToggleFavoritesAnimal(animalId, userId);
-
-            return new JsonModel<object>(
-                result,
-                result.Message,
-                result.StatusCode == "SUCCESS" ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest
-            );
-
-        }
-
 
         private class ImageJsonHelper
         {

@@ -2,6 +2,7 @@ namespace APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal
 {
     public class BrowseAnimalFilterDto
     {
+        public int UserId { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 12;
         public string? SearchTerm { get; set; }

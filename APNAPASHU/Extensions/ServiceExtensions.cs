@@ -42,6 +42,9 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IBrowseAnimalRepository, BrowseAnimalRepository>();
             services.AddScoped<IBrowseAnimalService, BrowseAnimalService>();
 
+            services.AddScoped<IFavoriteAnimalRepository, FavoriteAnimalRepository>();
+            services.AddScoped<IFavoriteAnimalService, FavoriteAnimalService>();
+
 
             // Mobile APIs
 

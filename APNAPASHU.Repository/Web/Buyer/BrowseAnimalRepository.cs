@@ -1,22 +1,28 @@
-using System.Data;
 using APNAPASHU.DataContract.Enums;
+using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal;
+using APNAPASHU.Repository.Data;
 using APNAPASHU.RepositoryContract.Web.Buyer;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace APNAPASHU.Repository.Web.Buyer
 {
     public class BrowseAnimalRepository : BaseRepository, IBrowseAnimalRepository
     {
-        public BrowseAnimalRepository(IConfiguration configuration) : base(configuration)
+        private readonly AppDbContext _context;
+        public BrowseAnimalRepository(IConfiguration configuration, AppDbContext context) : base(configuration)
         {
+            _context = context;    
         }
 
         public async Task<List<BrowseAnimalResponseModel>> BrowseAnimalsAsync(BrowseAnimalFilterDto filterDto)
         {
             DynamicParameters parameter = new DynamicParameters();
 
+            parameter.Add("@UserId", filterDto.UserId, DbType.Int32, ParameterDirection.Input);
             parameter.Add("@PageNumber", filterDto.PageNumber, DbType.Int32, ParameterDirection.Input);
             parameter.Add("@PageSize", filterDto.PageSize, DbType.Int32, ParameterDirection.Input);
             parameter.Add("@SearchTerm", filterDto.SearchTerm, DbType.String, ParameterDirection.Input);
@@ -47,6 +53,21 @@ namespace APNAPASHU.Repository.Web.Buyer
             );
 
             return result;
+        }
+
+        public async Task<SqlResponseModel> ToggleFavoritesAnimal(int animalId, int userId)
+        {
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@AnimalId", animalId);
+            parameters.Add("@UserId", userId);
+
+            return await UpdateAsync<SqlResponseModel>(
+                "usp_ToggleFavoriteAnimal",
+                parameters,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
         }
     }
 }
