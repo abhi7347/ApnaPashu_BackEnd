@@ -44,3 +44,18 @@ package-lock.json
 # OS files
 .DS_Store
 Thumbs.db
+
+# AI generated docs
+*_GUIDE.md
+*_REFERENCE.md
+SESSION_SUMMARY.md
+
+# Temporary reports
+build_*.txt
+
+# Test scripts
+test-*.js
+
+# Publish profiles
+Properties/PublishProfiles/*.pubxml
+*.publishsettings
