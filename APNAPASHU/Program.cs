@@ -125,5 +125,6 @@ app.MapControllers();
 
 // Map SignalR hubs
 app.MapHub<APNAPASHU.API.Hubs.ChatHub>("/hubs/chat");
+app.MapFallbackToFile("angular/index.html");
 
 app.Run();

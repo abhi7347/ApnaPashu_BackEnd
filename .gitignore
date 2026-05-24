@@ -59,3 +59,6 @@ test-*.js
 # Publish profiles
 Properties/PublishProfiles/*.pubxml
 *.publishsettings
+
+# Ignore entire Angular generated folder
+wwwroot/angular/
