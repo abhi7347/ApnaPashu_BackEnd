@@ -45,6 +45,10 @@ package-lock.json
 .DS_Store
 Thumbs.db
 
+# App settings with secrets
+appsettings.Development.json
+appsettings.Production.json
+
 # AI generated docs
 *_GUIDE.md
 *_REFERENCE.md
