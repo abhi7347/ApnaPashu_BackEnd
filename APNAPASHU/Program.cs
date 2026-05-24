@@ -93,6 +93,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Web Services
 builder.Services.AddWebServices();
 
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 32 * 1024 * 1024; // 32 MB max message size
+});
+
 var app = builder.Build();
 
 // Configure Middleware
@@ -116,5 +122,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<APNAPASHU.API.Hubs.ChatHub>("/hubs/chat");
 
 app.Run();

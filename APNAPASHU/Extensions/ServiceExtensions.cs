@@ -45,6 +45,12 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IFavoriteAnimalRepository, FavoriteAnimalRepository>();
             services.AddScoped<IFavoriteAnimalService, FavoriteAnimalService>();
 
+            services.AddScoped<IConversationRepository, ConversationRepository>();
+            services.AddScoped<IConversationService, ConversationService>();
+
+            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IMessageService, MessageService>();
+
 
             // Mobile APIs
 

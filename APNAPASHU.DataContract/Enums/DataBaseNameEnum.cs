@@ -2,7 +2,7 @@
 {
     public enum DataBaseNameEnum
         {
-            APNAPASHU = 0
+            db53402 = 0
         }
     
 }

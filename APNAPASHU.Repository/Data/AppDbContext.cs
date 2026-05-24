@@ -17,5 +17,7 @@ namespace APNAPASHU.Repository.Data
         public DbSet<PostedAnimal> PostedAnimals { get; set; }
         public DbSet<PostedAnimalImage> PostedAnimalImages { get; set; }
         public DbSet<AnimalPromotion> AnimalPromotions { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }
