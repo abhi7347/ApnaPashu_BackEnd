@@ -85,5 +85,29 @@ namespace APNAPASHU.Repository.Web.Buyer
 
             return result.FirstOrDefault();
         }
+
+        public async Task<List<BuyerInquiryResponseModel>> GetMyInquiriesAsync(int userId, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var parameter = new DynamicParameters();
+                parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
+                parameter.Add("@PageNumber", pageNumber, DbType.Int32, ParameterDirection.Input);
+                parameter.Add("@PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
+
+                var result = await GetAsyncList<BuyerInquiryResponseModel>(
+                    "[dbo].[usp_Get_UserConversations]",
+                    parameter,
+                    CommandType.StoredProcedure,
+                    DataBaseNameEnum.APNAPASHU
+                );
+
+                return result ?? new List<BuyerInquiryResponseModel>();
+            }
+            catch
+            {
+                return new List<BuyerInquiryResponseModel>();
+            }
+        }
     }
 }

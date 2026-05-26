@@ -1,6 +1,6 @@
-namespace APNAPASHU.DataContract.Models.Chat
+namespace APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal
 {
-    public class ConversationResponseModel
+    public class BuyerInquiryResponseModel
     {
         public int Id { get; set; }
 
@@ -25,5 +25,7 @@ namespace APNAPASHU.DataContract.Models.Chat
         public string? AnimalImage { get; set; }
 
         public string? Status { get; set; }
+
+        public int TotalRecords { get; set; }
     }
 }

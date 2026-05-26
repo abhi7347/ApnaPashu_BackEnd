@@ -56,5 +56,17 @@ namespace APNAPASHU.API.Controllers.Web.Buyer
             var result = await _service.GetAnimalDetailsByIdAsync(id, userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
+
+        [HttpGet("my-inquiries")]
+        [Authorize]
+        [ProducesResponseType(typeof(JsonModel<List<BuyerInquiryResponseModel>>), 200)]
+        public async Task<IActionResult> GetMyInquiries([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        {
+            int userId = GetAuthenticatedUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _service.GetMyInquiriesAsync(userId, pageNumber, pageSize);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
     }
 }

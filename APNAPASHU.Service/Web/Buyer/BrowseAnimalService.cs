@@ -127,6 +127,29 @@ namespace APNAPASHU.Service.Web.Buyer
             return new JsonModel<AnimalDetailsResponseModel>(item, "Animal details retrieved successfully.", 200);
         }
 
+        public async Task<JsonModel<List<BuyerInquiryResponseModel>>> GetMyInquiriesAsync(int userId, int pageNumber, int pageSize)
+        {
+            var result = await _repository.GetMyInquiriesAsync(userId, pageNumber, pageSize);
+
+            foreach (var item in result)
+            {
+                if (!string.IsNullOrEmpty(item.AnimalImage) && item.AnimalId.HasValue)
+                {
+                    try
+                    {
+                        var urls = await _uploader.GetFileUrlsAsync(new List<string> { item.AnimalImage }, $"posted-animals/{item.AnimalId}");
+                        item.AnimalImage = urls.FirstOrDefault();
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                }
+            }
+
+            return new JsonModel<List<BuyerInquiryResponseModel>>(result, "Inquiries retrieved successfully.", 200);
+        }
+
         private class ImageJsonHelper
         {
             public string? ImageName { get; set; }
