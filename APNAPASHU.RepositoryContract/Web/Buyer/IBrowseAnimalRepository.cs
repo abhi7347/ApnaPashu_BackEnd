@@ -8,7 +8,6 @@ namespace APNAPASHU.RepositoryContract.Web.Buyer
         Task<List<BrowseAnimalResponseModel>> BrowseAnimalsAsync(BrowseAnimalFilterDto filterDto);
 
         Task<SqlResponseModel> ToggleFavoritesAnimal(int animalId, int userId);
-        
+        Task<AnimalDetailsResponseModel> GetAnimalDetailsByIdAsync(int id, int userId);
     }
-
 }

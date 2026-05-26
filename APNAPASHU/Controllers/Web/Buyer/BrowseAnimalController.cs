@@ -46,5 +46,15 @@ namespace APNAPASHU.API.Controllers.Web.Buyer
             var result = await _service.ToggleFavoritesAnimal(animalId, userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(JsonModel<AnimalDetailsResponseModel>), 200)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            int userId = GetAuthenticatedUserId();
+            var result = await _service.GetAnimalDetailsByIdAsync(id, userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
     }
 }

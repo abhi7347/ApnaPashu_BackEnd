@@ -7,6 +7,7 @@ namespace APNAPASHU.ServiceContract.Web.Buyer
     {
         Task<JsonModel<List<BrowseAnimalResponseModel>>> BrowseAnimalsAsync(BrowseAnimalFilterDto filter);
         Task<JsonModel<object>> ToggleFavoritesAnimal(int animalId, int userId);
+        Task<JsonModel<AnimalDetailsResponseModel>> GetAnimalDetailsByIdAsync(int id, int userId);
 
     }
 }

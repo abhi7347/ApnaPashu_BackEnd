@@ -69,5 +69,21 @@ namespace APNAPASHU.Repository.Web.Buyer
                 DataBaseNameEnum.APNAPASHU
             );
         }
+
+        public async Task<AnimalDetailsResponseModel> GetAnimalDetailsByIdAsync(int id, int userId)
+        {
+            DynamicParameters parameter = new DynamicParameters();
+            parameter.Add("@Id", id, DbType.Int32, ParameterDirection.Input);
+            parameter.Add("@BuyerUserId", userId == 0 ? null : (int?)userId, DbType.Int32, ParameterDirection.Input);
+
+            var result = await GetAsyncList<AnimalDetailsResponseModel>(
+                "[dbo].[usp_Buyer_GetAnimalDetailsById]",
+                parameter,
+                CommandType.StoredProcedure,
+                DataBaseNameEnum.APNAPASHU
+            );
+
+            return result.FirstOrDefault();
+        }
     }
 }
