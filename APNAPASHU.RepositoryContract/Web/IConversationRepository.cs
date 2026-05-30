@@ -7,7 +7,7 @@ namespace APNAPASHU.RepositoryContract.Web
     {
         Task<Conversation?> GetConversationByIdAsync(int conversationId);
 
-        Task<List<ConversationResponseModel>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20);
+        Task<List<ConversationResponseModel>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20, string? statusFilter = null);
 
         Task<Conversation?> GetOrCreateConversationAsync(int senderUserId, int receiverUserId, int? animalId = null);
 

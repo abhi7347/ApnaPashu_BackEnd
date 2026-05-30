@@ -1,9 +1,9 @@
+using APNAPASHU.DataContract.Entity;
+
 namespace APNAPASHU.DataContract.Models.Chat
 {
-    public class MessageResponseModel
+    public class MessageResponseModel: BaseEntity
     {
-        public int Id { get; set; }
-
         public int ConversationId { get; set; }
 
         public int SenderUserId { get; set; }
@@ -13,9 +13,6 @@ namespace APNAPASHU.DataContract.Models.Chat
         public bool IsRead { get; set; }
 
         public DateTime? ReadDate { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
         public string? SenderName { get; set; }
     }
 }

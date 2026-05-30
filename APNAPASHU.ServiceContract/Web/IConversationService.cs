@@ -7,7 +7,7 @@ namespace APNAPASHU.ServiceContract.Web
     {
         Task<JsonModel<ConversationResponseModel?>> GetConversationByIdAsync(int conversationId);
 
-        Task<JsonModel<List<ConversationResponseModel>>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20);
+        Task<JsonModel<List<ConversationResponseModel>>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20, string? statusFilter = null);
 
         Task<JsonModel<ConversationResponseModel>> CreateConversationAsync(CreateConversationRequestModel model, int currentUserId);
 

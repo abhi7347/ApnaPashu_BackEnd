@@ -38,7 +38,7 @@ namespace APNAPASHU.Service.Web
                     ReceiverUserId = conversation.ReceiverUserId,
                     LastMessage = conversation.LastMessage,
                     LastMessageDate = conversation.LastMessageDate,
-                    CreatedDate = conversation.CreatedDate
+                    CreatedDate = conversation.CreatedDate ?? DateTime.MinValue,
                 };
 
                 return new JsonModel<ConversationResponseModel?>(response, "Conversation retrieved successfully", (int)HttpStatusCode.OK);
@@ -49,11 +49,11 @@ namespace APNAPASHU.Service.Web
             }
         }
 
-        public async Task<JsonModel<List<ConversationResponseModel>>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20)
+        public async Task<JsonModel<List<ConversationResponseModel>>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20, string? statusFilter = null)
         {
             try
             {
-                var conversations = await _repository.GetUserConversationsAsync(userId, pageNumber, pageSize);
+                var conversations = await _repository.GetUserConversationsAsync(userId, pageNumber, pageSize, statusFilter);
                 return new JsonModel<List<ConversationResponseModel>>(conversations, "Conversations retrieved successfully", (int)HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -66,6 +66,7 @@ namespace APNAPASHU.Service.Web
         {
             try
             {
+
                 if (model.ReceiverUserId == 0 || currentUserId == 0)
                     return new JsonModel<ConversationResponseModel>(null, "Invalid user IDs", (int)HttpStatusCode.BadRequest);
 
@@ -85,7 +86,7 @@ namespace APNAPASHU.Service.Web
                     ReceiverUserId = conversation.ReceiverUserId,
                     LastMessage = conversation.LastMessage,
                     LastMessageDate = conversation.LastMessageDate,
-                    CreatedDate = conversation.CreatedDate
+                    CreatedDate = conversation.CreatedDate ?? DateTime.MinValue,
                 };
 
                 return new JsonModel<ConversationResponseModel>(response, "Conversation created successfully", (int)HttpStatusCode.OK);

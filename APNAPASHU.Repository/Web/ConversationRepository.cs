@@ -32,7 +32,7 @@ namespace APNAPASHU.Repository.Web
             }
         }
 
-        public async Task<List<ConversationResponseModel>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20)
+        public async Task<List<ConversationResponseModel>> GetUserConversationsAsync(int userId, int pageNumber = 1, int pageSize = 20, string? statusFilter = null)
         {
             try
             {
@@ -40,6 +40,14 @@ namespace APNAPASHU.Repository.Web
                 parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
                 parameter.Add("@PageNumber", pageNumber, DbType.Int32, ParameterDirection.Input);
                 parameter.Add("@PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
+                if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "All")
+                {
+                    parameter.Add("@StatusFilter", statusFilter, DbType.String, ParameterDirection.Input);
+                }
+                else
+                {
+                    parameter.Add("@StatusFilter", null, DbType.String, ParameterDirection.Input);
+                }
 
                 var result = await GetAsyncList<ConversationResponseModel>(
                     "[dbo].[usp_Get_UserConversations]",
@@ -57,36 +65,30 @@ namespace APNAPASHU.Repository.Web
 
         public async Task<Conversation?> GetOrCreateConversationAsync(int senderUserId, int receiverUserId, int? animalId = null)
         {
-            try
+            var existingConversation = await _context.Conversations
+                .FirstOrDefaultAsync(c =>
+                    ((c.SenderUserId == senderUserId && c.ReceiverUserId == receiverUserId) ||
+                        (c.SenderUserId == receiverUserId && c.ReceiverUserId == senderUserId)) &&
+                    c.IsDeleted == false);
+
+            if (existingConversation != null)
+                return existingConversation;
+
+            var newConversation = new Conversation
             {
-                var existingConversation = await _context.Conversations
-                    .FirstOrDefaultAsync(c =>
-                        ((c.SenderUserId == senderUserId && c.ReceiverUserId == receiverUserId) ||
-                         (c.SenderUserId == receiverUserId && c.ReceiverUserId == senderUserId)) &&
-                        c.IsDeleted == false);
+                AnimalId = animalId,
+                SenderUserId = senderUserId,
+                ReceiverUserId = receiverUserId,
+                CreatedBy = senderUserId,
+                CreatedDate = DateTime.UtcNow,
+                IsActive = true,
+                IsDeleted = false
+            };
 
-                if (existingConversation != null)
-                    return existingConversation;
+            _context.Conversations.Add(newConversation);
+            await _context.SaveChangesAsync();
 
-                var newConversation = new Conversation
-                {
-                    AnimalId = animalId,
-                    SenderUserId = senderUserId,
-                    ReceiverUserId = receiverUserId,
-                    CreatedBy = senderUserId,
-                    CreatedDate = DateTime.UtcNow,
-                    IsDeleted = false
-                };
-
-                _context.Conversations.Add(newConversation);
-                await _context.SaveChangesAsync();
-
-                return newConversation;
-            }
-            catch
-            {
-                return null;
-            }
+            return newConversation;            
         }
 
         public async Task<int> CreateConversationAsync(Conversation conversation)
@@ -111,7 +113,7 @@ namespace APNAPASHU.Repository.Web
         {
             try
             {
-                conversation.ModifiedDate = DateTime.UtcNow;
+                conversation.UpdatedDate = DateTime.UtcNow;
                 _context.Conversations.Update(conversation);
                 await _context.SaveChangesAsync();
                 return true;
@@ -134,8 +136,8 @@ namespace APNAPASHU.Repository.Web
 
                 conversation.LastMessage = message;
                 conversation.LastMessageDate = DateTime.UtcNow;
-                conversation.ModifiedBy = senderUserId;
-                conversation.ModifiedDate = DateTime.UtcNow;
+                conversation.UpdatedBy = senderUserId;
+                conversation.UpdatedDate = DateTime.UtcNow;
 
                 _context.Conversations.Update(conversation);
                 await _context.SaveChangesAsync();

@@ -60,6 +60,7 @@ namespace APNAPASHU.Repository.Web
             try
             {
                 message.CreatedDate = DateTime.UtcNow;
+                message.IsActive = true;
                 message.IsDeleted = false;
                 message.IsRead = false;
 

@@ -1,3 +1,4 @@
+#nullable disable
 using APNAPASHU.DataContract.Enums;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Buyer.BrowseAnimal;
