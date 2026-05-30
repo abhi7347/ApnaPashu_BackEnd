@@ -110,5 +110,48 @@ namespace APNAPASHU.Repository.Web.Buyer
                 return new List<BuyerInquiryResponseModel>();
             }
         }
+
+        public async Task SaveRecentViewAsync(int userId, int animalId)
+        {
+            try
+            {
+                DynamicParameters parameter = new DynamicParameters();
+                parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
+                parameter.Add("@AnimalId", animalId, DbType.Int32, ParameterDirection.Input);
+
+                await AddAsync(
+                    "[dbo].[usp_Save_UserRecentView]",
+                    parameter,
+                    CommandType.StoredProcedure,
+                    DataBaseNameEnum.APNAPASHU
+                );
+            }
+            catch
+            {
+                // Silently ignore tracking errors
+            }
+        }
+
+        public async Task<List<BrowseAnimalResponseModel>> GetRecentlyViewedAnimalsAsync(int userId)
+        {
+            try
+            {
+                DynamicParameters parameter = new DynamicParameters();
+                parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
+
+                var result = await GetAsyncList<BrowseAnimalResponseModel>(
+                    "[dbo].[usp_Buyer_GetRecentlyViewedAnimals]",
+                    parameter,
+                    CommandType.StoredProcedure,
+                    DataBaseNameEnum.APNAPASHU
+                );
+
+                return result ?? new List<BrowseAnimalResponseModel>();
+            }
+            catch
+            {
+                return new List<BrowseAnimalResponseModel>();
+            }
+        }
     }
 }

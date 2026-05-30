@@ -68,5 +68,17 @@ namespace APNAPASHU.API.Controllers.Web.Buyer
             var result = await _service.GetMyInquiriesAsync(userId, pageNumber, pageSize);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
+
+        [HttpGet("recently-viewed")]
+        [Authorize]
+        [ProducesResponseType(typeof(JsonModel<List<BrowseAnimalResponseModel>>), 200)]
+        public async Task<IActionResult> GetRecentlyViewed()
+        {
+            int userId = GetAuthenticatedUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _service.GetRecentlyViewedAnimalsAsync(userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
     }
 }

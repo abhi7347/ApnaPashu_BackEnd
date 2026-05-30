@@ -25,5 +25,7 @@ namespace APNAPASHU.DataContract.Models.Chat
         public string? AnimalImage { get; set; }
 
         public string? Status { get; set; }
+
+        public int UnreadCount { get; set; }
     }
 }
