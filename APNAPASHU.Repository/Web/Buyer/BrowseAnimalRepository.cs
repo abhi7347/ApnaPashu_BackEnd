@@ -175,5 +175,27 @@ namespace APNAPASHU.Repository.Web.Buyer
                 return new BuyerDashboardStatsResponseModel();
             }
         }
+
+        public async Task<SqlResponseModel> RequestRoleUpgradeAsync(int userId)
+        {
+            try
+            {
+                DynamicParameters parameter = new DynamicParameters();
+                parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
+
+                var result = await GetAsyncList<SqlResponseModel>(
+                    "[dbo].[usp_Buyer_RequestRoleUpgrade]",
+                    parameter,
+                    CommandType.StoredProcedure,
+                    DataBaseNameEnum.APNAPASHU
+                );
+
+                return result?.FirstOrDefault() ?? new SqlResponseModel { StatusCode = "ERROR", Message = "Something went wrong." };
+            }
+            catch (Exception ex)
+            {
+                return new SqlResponseModel { StatusCode = "ERROR", Message = ex.Message };
+            }
+        }
     }
 }

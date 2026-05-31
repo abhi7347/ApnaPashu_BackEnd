@@ -92,5 +92,17 @@ namespace APNAPASHU.API.Controllers.Web.Buyer
             var result = await _service.GetDashboardStatsAsync(userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
+
+        [HttpPost("request-role-upgrade")]
+        [Authorize]
+        [ProducesResponseType(typeof(JsonModel<object>), 200)]
+        public async Task<IActionResult> RequestRoleUpgrade()
+        {
+            int userId = GetAuthenticatedUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _service.RequestRoleUpgradeAsync(userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
     }
 }

@@ -217,5 +217,11 @@ namespace APNAPASHU.Service.Web.Buyer
             var result = await _repository.GetDashboardStatsAsync(userId);
             return new JsonModel<BuyerDashboardStatsResponseModel>(result, "Dashboard stats retrieved successfully.", 200);
         }
+
+        public async Task<JsonModel<object>> RequestRoleUpgradeAsync(int userId)
+        {
+            var result = await _repository.RequestRoleUpgradeAsync(userId);
+            return new JsonModel<object>(null, result.Message, result.StatusCode == "SUCCESS" ? 200 : 400);
+        }
     }
 }
