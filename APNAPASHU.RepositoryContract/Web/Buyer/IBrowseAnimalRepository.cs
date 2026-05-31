@@ -13,5 +13,6 @@ namespace APNAPASHU.RepositoryContract.Web.Buyer
         
         Task SaveRecentViewAsync(int userId, int animalId);
         Task<List<BrowseAnimalResponseModel>> GetRecentlyViewedAnimalsAsync(int userId);
+        Task<BuyerDashboardStatsResponseModel> GetDashboardStatsAsync(int userId);
     }
 }

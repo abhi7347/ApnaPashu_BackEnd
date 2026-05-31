@@ -10,5 +10,6 @@ namespace APNAPASHU.ServiceContract.Web.Buyer
         Task<JsonModel<AnimalDetailsResponseModel>> GetAnimalDetailsByIdAsync(int id, int userId);
         Task<JsonModel<List<BuyerInquiryResponseModel>>> GetMyInquiriesAsync(int userId, int pageNumber, int pageSize);
         Task<JsonModel<List<BrowseAnimalResponseModel>>> GetRecentlyViewedAnimalsAsync(int userId);
+        Task<JsonModel<BuyerDashboardStatsResponseModel>> GetDashboardStatsAsync(int userId);
     }
 }

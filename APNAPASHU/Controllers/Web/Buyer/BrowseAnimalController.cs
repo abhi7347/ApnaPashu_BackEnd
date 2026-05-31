@@ -80,5 +80,17 @@ namespace APNAPASHU.API.Controllers.Web.Buyer
             var result = await _service.GetRecentlyViewedAnimalsAsync(userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
+
+        [HttpGet("dashboard-stats")]
+        [Authorize]
+        [ProducesResponseType(typeof(JsonModel<BuyerDashboardStatsResponseModel>), 200)]
+        public async Task<IActionResult> GetDashboardStats()
+        {
+            int userId = GetAuthenticatedUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _service.GetDashboardStatsAsync(userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
+        }
     }
 }

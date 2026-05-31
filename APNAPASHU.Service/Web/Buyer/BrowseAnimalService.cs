@@ -211,5 +211,11 @@ namespace APNAPASHU.Service.Web.Buyer
             public string? ImageName { get; set; }
             public string? Value { get; set; }
         }
+
+        public async Task<JsonModel<BuyerDashboardStatsResponseModel>> GetDashboardStatsAsync(int userId)
+        {
+            var result = await _repository.GetDashboardStatsAsync(userId);
+            return new JsonModel<BuyerDashboardStatsResponseModel>(result, "Dashboard stats retrieved successfully.", 200);
+        }
     }
 }

@@ -153,5 +153,27 @@ namespace APNAPASHU.Repository.Web.Buyer
                 return new List<BrowseAnimalResponseModel>();
             }
         }
+
+        public async Task<BuyerDashboardStatsResponseModel> GetDashboardStatsAsync(int userId)
+        {
+            try
+            {
+                DynamicParameters parameter = new DynamicParameters();
+                parameter.Add("@UserId", userId, DbType.Int32, ParameterDirection.Input);
+
+                var result = await GetAsyncList<BuyerDashboardStatsResponseModel>(
+                    "[dbo].[usp_Buyer_GetDashboardStats]",
+                    parameter,
+                    CommandType.StoredProcedure,
+                    DataBaseNameEnum.APNAPASHU
+                );
+
+                return result?.FirstOrDefault() ?? new BuyerDashboardStatsResponseModel();
+            }
+            catch
+            {
+                return new BuyerDashboardStatsResponseModel();
+            }
+        }
     }
 }
