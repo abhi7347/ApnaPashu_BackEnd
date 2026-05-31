@@ -38,6 +38,8 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IPostedAnimalRepository, PostedAnimalRepository>();
             services.AddScoped<IPostedAnimalService, PostedAnimalService>();
             services.AddScoped<IAnimalPromotionRepository, AnimalPromotionRepository>();
+            services.AddScoped<ISellerDashboardRepository, SellerDashboardRepository>();
+            services.AddScoped<ISellerDashboardService, SellerDashboardService>();
 
             services.AddScoped<IBrowseAnimalRepository, BrowseAnimalRepository>();
             services.AddScoped<IBrowseAnimalService, BrowseAnimalService>();
