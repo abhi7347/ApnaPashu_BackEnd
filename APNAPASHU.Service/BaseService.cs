@@ -49,7 +49,7 @@ namespace APNAPASHU.Service
             {
                 using var message = new MailMessage
                 {
-                    From = new MailAddress(Configuration["Email:From"], "ApnaPashu"),
+                    From = new MailAddress(Configuration["Email:From"] ?? string.Empty, "ApnaPashu"),
                     Subject = model.Subject,
                     Body = model.Body,
                     IsBodyHtml = true,
@@ -59,11 +59,11 @@ namespace APNAPASHU.Service
 
                 using var client = new SmtpClient
                 {
-                    Host = Configuration["Email:Host"],
-                    Port = int.Parse(Configuration["Email:Port"]),
+                    Host = Configuration["Email:Host"] ?? string.Empty,
+                    Port = int.Parse(Configuration["Email:Port"] ?? "0"),
                     Credentials = new NetworkCredential(
-                        Configuration["Email:Username"],
-                        Configuration["Email:Password"]
+                        Configuration["Email:Username"] ?? string.Empty,
+                        Configuration["Email:Password"] ?? string.Empty
                     ),
                     EnableSsl = true
                 };

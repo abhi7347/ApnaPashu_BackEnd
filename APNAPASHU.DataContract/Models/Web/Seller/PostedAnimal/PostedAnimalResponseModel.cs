@@ -3,7 +3,7 @@ namespace APNAPASHU.DataContract.Models.Web.Seller.PostedAnimal
 
     public class PostedAnimalResponseModel: CommonAuditDto
     {
-        public int Id { get; set; }
+        new public int Id { get; set; }
         public string? Name { get; set; }
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }

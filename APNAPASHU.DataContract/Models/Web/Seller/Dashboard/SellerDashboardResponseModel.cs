@@ -15,10 +15,10 @@ namespace APNAPASHU.DataContract.Models.Web.Seller.Dashboard
     {
         public int ConversationId { get; set; }
         public int AnimalId { get; set; }
-        public string AnimalName { get; set; }
+        public string? AnimalName { get; set; }
         public int BuyerId { get; set; }
-        public string BuyerName { get; set; }
-        public string LastMessage { get; set; }
+        public string? BuyerName { get; set; }
+        public string? LastMessage { get; set; }
         public DateTime? LastMessageDate { get; set; }
     }
 

@@ -194,7 +194,7 @@ namespace APNAPASHU.Service.Web
             var audience = jwtSettings["Audience"];
             var expiryMinutes = int.Parse(jwtSettings["ExpiryMinutes"] ?? "1440");
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey ?? string.Empty));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

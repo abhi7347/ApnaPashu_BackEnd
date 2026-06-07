@@ -28,18 +28,18 @@ namespace APNAPASHU.Repository.Web.Buyer
             parameter.Add("@PageSize", filterDto.PageSize, DbType.Int32, ParameterDirection.Input);
             parameter.Add("@SearchTerm", filterDto.SearchTerm, DbType.String, ParameterDirection.Input);
 
-            string? categoryIds = filterDto.CategoryIds != null && filterDto.CategoryIds.Any() 
+            string categoryIds = filterDto.CategoryIds != null && filterDto.CategoryIds.Any() 
                 ? string.Join(",", filterDto.CategoryIds) : null;
             parameter.Add("@CategoryIds", categoryIds, DbType.String, ParameterDirection.Input);
 
             parameter.Add("@MinPrice", filterDto.MinPrice, DbType.Decimal, ParameterDirection.Input);
             parameter.Add("@MaxPrice", filterDto.MaxPrice, DbType.Decimal, ParameterDirection.Input);
 
-            string? ageRanges = filterDto.AgeRanges != null && filterDto.AgeRanges.Any() 
+            string ageRanges = filterDto.AgeRanges != null && filterDto.AgeRanges.Any() 
                 ? string.Join(",", filterDto.AgeRanges) : null;
             parameter.Add("@AgeRanges", ageRanges, DbType.String, ParameterDirection.Input);
 
-            string? genders = filterDto.Genders != null && filterDto.Genders.Any() 
+            string genders = filterDto.Genders != null && filterDto.Genders.Any() 
                 ? string.Join(",", filterDto.Genders) : null;
             parameter.Add("@Genders", genders, DbType.String, ParameterDirection.Input);
 

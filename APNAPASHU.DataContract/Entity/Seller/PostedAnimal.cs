@@ -7,7 +7,7 @@ namespace APNAPASHU.DataContract.Entity.Seller
     public class PostedAnimal: BaseEntity
     {
         [Key]
-        public int Id { get; set; }
+        new public int Id { get; set; }
         public string? Name { get; set; }
         public int CategoryId { get; set; }
         public string? Breed { get; set; }

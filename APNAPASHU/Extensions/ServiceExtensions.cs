@@ -17,6 +17,10 @@ using APNAPASHU.Repository.Web.Buyer;
 using APNAPASHU.RepositoryContract.Web.Buyer;
 using APNAPASHU.Service.Web.Buyer;
 using APNAPASHU.ServiceContract.Web.Buyer;
+using APNAPASHU.Repository.Web.Public;
+using APNAPASHU.RepositoryContract.Web.Public;
+using APNAPASHU.Service.Web.Public;
+using APNAPASHU.ServiceContract.Web.Public;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace APNAPASHU.API.Extensions
@@ -52,6 +56,9 @@ namespace APNAPASHU.API.Extensions
 
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IMessageService, MessageService>();
+            
+            services.AddScoped<IUserIndexRepository, UserIndexRepository>();
+            services.AddScoped<IUserIndexService, UserIndexService>();
 
 
             // Mobile APIs

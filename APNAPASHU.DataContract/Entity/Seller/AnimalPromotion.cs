@@ -7,7 +7,7 @@ namespace APNAPASHU.DataContract.Entity.Seller
     public class AnimalPromotion : BaseEntity
     {
         [Key]
-        public int Id { get; set; }
+        new public int Id { get; set; }
 
         public int AnimalId { get; set; }
         public int UserId { get; set; }

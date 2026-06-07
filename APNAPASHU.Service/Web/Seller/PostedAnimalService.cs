@@ -55,6 +55,7 @@ namespace APNAPASHU.Service.Web.Seller
                         var names = jsonImages
                             .Select(x => x.Value ?? x.ImageName)
                             .Where(x => !string.IsNullOrEmpty(x))
+                            .Select(x => x!)
                             .ToList();
 
                         if (names.Any())
@@ -132,6 +133,7 @@ namespace APNAPASHU.Service.Web.Seller
                         originalNames = jsonImages?
                             .Select(x => x.Value ?? x.ImageName)
                             .Where(x => !string.IsNullOrEmpty(x))
+                            .Select(x => x!)
                             .ToList() ?? new List<string>();
                     }
                     catch { }
@@ -142,7 +144,7 @@ namespace APNAPASHU.Service.Web.Seller
                 {
                     try { return Path.GetFileName(new Uri(x).LocalPath); }
                     catch { return x; }
-                }).Where(x => !string.IsNullOrEmpty(x)).ToList() ?? new List<string>();
+                }).Where(x => !string.IsNullOrEmpty(x)).Select(x => x!).ToList() ?? new List<string>();
 
                 // 2. Identify what to DELETE from storage (Original - Kept)
                 var toDelete = originalNames.Where(n => !keptNames.Contains(n)).ToList();

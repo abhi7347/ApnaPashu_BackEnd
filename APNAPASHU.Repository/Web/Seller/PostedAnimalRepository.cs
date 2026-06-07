@@ -52,7 +52,7 @@ namespace APNAPASHU.Repository.Web.Seller
                 DataBaseNameEnum.APNAPASHU
             );
 
-            return result.FirstOrDefault();
+            return result.FirstOrDefault() ?? new PostedAnimalResponseModel();
         }
 
         public async Task<List<PostedAnimalResponseModel>> GetByIdsAsync(List<int> ids)
