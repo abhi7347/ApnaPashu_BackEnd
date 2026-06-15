@@ -60,6 +60,11 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IUserIndexRepository, UserIndexRepository>();
             services.AddScoped<IUserIndexService, UserIndexService>();
 
+            services.AddScoped<IAdminSidebarRepository, AdminSidebarRepository>();
+            services.AddScoped<IAdminSidebarService, AdminSidebarService>();
+
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IPermissionService, PermissionService>();
 
             // Mobile APIs
 

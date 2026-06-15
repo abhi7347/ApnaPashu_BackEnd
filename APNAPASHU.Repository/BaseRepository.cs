@@ -81,9 +81,9 @@ namespace APNAPASHU.Repository
                 {
                     result = await conn.QueryFirstOrDefaultAsync<T>(query, parameter, null, null, commandType);
                 }
-                catch (System.Exception ex)
+                catch (System.Exception)
                 {
-                    string message = ex.Message;
+                    // Ignore or log error
                 }
             }
 
@@ -102,10 +102,9 @@ namespace APNAPASHU.Repository
                 {
                     result = await conn.QueryAsync<T>(query, parameters, null, null, commandType);
                 }
-                catch (System.Exception ex)
+                catch (System.Exception)
                 {
-                    string message = ex.Message;
-
+                    // Ignore or log error
                 }
 
             }
@@ -132,9 +131,9 @@ namespace APNAPASHU.Repository
                 {
                     result = await conn.ExecuteAsync(sql, parameters, null, null, commandType);
                 }
-                catch (System.Exception ex)
+                catch (System.Exception)
                 {
-                    string message = ex.Message;
+                    // Ignore or log error
                 }
             }
 
@@ -255,6 +254,34 @@ namespace APNAPASHU.Repository
             }
         }
 
+        public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>)> QueryMultipleAsync<T1, T2, T3>(
+        string query,
+        DynamicParameters parameters = null,
+        CommandType? commandType = null,
+        DataBaseNameEnum databaseID = DataBaseNameEnum.APNAPASHU)
+        {
+            try
+            {
+                using (var conn = GetConnection(databaseID) as SqlConnection)
+                {
+                    await conn.OpenAsync();
+
+                    using (var multi = await conn.QueryMultipleAsync(query, parameters, commandType: commandType))
+                    {
+                        var result1 = (await multi.ReadAsync<T1>()).ToList();
+                        var result2 = (await multi.ReadAsync<T2>()).ToList();
+                        var result3 = (await multi.ReadAsync<T3>()).ToList();
+
+                        return (result1, result2, result3);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
         public async Task<List<T>> GetAsyncList<T>(string query, DynamicParameters parameters = null, CommandType? commandType = null, DataBaseNameEnum? databaseID = null)
         {
@@ -267,7 +294,7 @@ namespace APNAPASHU.Repository
                 }
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
