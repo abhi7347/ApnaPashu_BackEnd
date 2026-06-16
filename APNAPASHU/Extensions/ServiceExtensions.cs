@@ -66,6 +66,9 @@ namespace APNAPASHU.API.Extensions
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IPermissionService, PermissionService>();
 
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IRoleService, RoleService>();
+
             // Mobile APIs
 
             return services;

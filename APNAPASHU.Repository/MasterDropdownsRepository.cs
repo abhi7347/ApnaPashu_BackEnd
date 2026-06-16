@@ -1,4 +1,4 @@
-﻿using APNAPASHU.DataContract.Models;
+using APNAPASHU.DataContract.Models;
 using APNAPASHU.Repository.Data;
 using APNAPASHU.RepositoryContract;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ namespace APNAPASHU.Repository
                 .Where(x => (x.IsActive ?? true) && !(x.IsDeleted ?? false))
                 .Select(x => new MasterDropdownsModels
                 {
-                    Id = x.Id ?? 0,
+                    Id = x.Id,
                     Name = x.RoleName
                 })
                 .ToListAsync();
