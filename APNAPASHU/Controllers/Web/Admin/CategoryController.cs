@@ -2,87 +2,67 @@ using Microsoft.AspNetCore.Mvc;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 using APNAPASHU.ServiceContract.Web.Admin;
+using System.Net;
 
 namespace APNAPASHU.API.Controllers.Web.Admin
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/[controller]")]
     [ApiController]
     public class CategoryController : BaseController
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger<CategoryController> _logger;
 
         public CategoryController(
             ICategoryService categoryService,
             IHttpContextAccessor httpContextAccessor,
-            IConfiguration configuration,
-            ILogger<CategoryController> logger)
+            IConfiguration configuration)
             : base(httpContextAccessor, configuration)
         {
             _categoryService = categoryService;
-            _logger = logger;
         }
 
-        /// <summary>
-        /// Get all categories
-        /// </summary>
-        [HttpGet("web/get-all")]
-        [ProducesResponseType(typeof(JsonModel<List<CatetoryResponseModel>>), 200)]
+        [HttpGet("get-all")]
+        [ProducesResponseType(typeof(JsonModel<List<CategoryResponseModel>>), 200)]
         public async Task<IActionResult> GetAll([FromQuery] FilterDto filter)
         {
             var result = await _categoryService.GetAllAsync(filter);
-            return Ok(result);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
 
-        /// <summary>
-        /// Get category by Id
-        /// </summary>
-        [HttpGet("{categoryId}")]
-        [ProducesResponseType(typeof(JsonModel<CatetoryResponseModel>), 200)]
-        public async Task<IActionResult> GetById(int categoryId)
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(JsonModel<CategoryResponseModel>), 200)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var result = await _categoryService.GetByIdAsync(categoryId);
-            return Ok(result);
+            var result = await _categoryService.GetByIdAsync(id);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
 
-        /// <summary>
-        /// Create or Update category
-        /// </summary>
         [HttpPost("upsert")]
         [ProducesResponseType(typeof(JsonModel<object>), 200)]
-        public async Task<IActionResult> Upsert([FromBody] CategoryUpsertModel model)
+        public async Task<IActionResult> Upsert([FromForm] CategoryUpsertModel model)
         {
             int userId = GetAuthenticatedUserId();
-
             var result = await _categoryService.UpsertAsync(model, userId);
-            return Ok(result);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
 
-        /// <summary>
-        /// Update category status
-        /// </summary>
-        [HttpPut("update-status")]
+        [HttpPost("update-status")]
         [ProducesResponseType(typeof(JsonModel<object>), 200)]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusDto model)
         {
             int userId = GetAuthenticatedUserId();
             model.UserId = userId;
-
             var result = await _categoryService.UpdateStatusAsync(model);
-            return Ok(result);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
 
-        /// <summary>
-        /// Delete category (soft delete)
-        /// </summary>
-        [HttpDelete("{categoryId}")]
+        [HttpPost("delete")]
         [ProducesResponseType(typeof(JsonModel<object>), 200)]
-        public async Task<IActionResult> Delete(int categoryId)
+        public async Task<IActionResult> Delete([FromBody] List<int> ids)
         {
-            int userId = GetAuthenticatedUserId(); 
-
-            var result = await _categoryService.DeleteAsync(categoryId, userId);
-            return Ok(result);
+            int userId = GetAuthenticatedUserId();
+            var result = await _categoryService.DeleteAsync(ids, userId);
+            return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
     }
 }

@@ -3,32 +3,12 @@ using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 
 namespace APNAPASHU.ServiceContract.Web.Admin
 {
-    /// <summary>
-    /// Category Service Interface for Web - CRUD Template
-    /// </summary>
     public interface ICategoryService
     {
-        /// <summary>
-        /// Get all categories with filtering and pagination
-        /// </summary>
-        Task<JsonModel<List<CatetoryResponseModel>>> GetAllAsync(FilterDto filterDto);
-
-        /// <summary>
-        /// Create or Update category (Upsert)
-        /// </summary>
-        Task<JsonModel<CatetoryResponseModel>> GetByIdAsync(int categoryId);
-
-        /// <summary>
-        /// Update category status (IsActive)
-        /// </summary>
+        Task<JsonModel<List<CategoryResponseModel>>> GetAllAsync(FilterDto filter);
+        Task<JsonModel<CategoryResponseModel>> GetByIdAsync(int id);
         Task<JsonModel<object>> UpsertAsync(CategoryUpsertModel model, int userId);
-
-        /// <summary>
-        /// Delete category (soft delete)
-        /// </summary>
-        Task<JsonModel<object>> DeleteAsync(int categoryId, int userId);
-
         Task<JsonModel<object>> UpdateStatusAsync(UpdateStatusDto model);
-
+        Task<JsonModel<object>> DeleteAsync(List<int> ids, int userId);
     }
 }

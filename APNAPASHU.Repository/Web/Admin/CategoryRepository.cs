@@ -1,118 +1,122 @@
-#nullable disable
 using Dapper;
 using System.Data;
-using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Enums;
 using APNAPASHU.DataContract.Models.Web.Admin.Categories;
 using APNAPASHU.RepositoryContract.Web.Admin;
+using APNAPASHU.Repository.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace APNAPASHU.Repository.Web.Admin
 {
-    /// <summary>
-    /// Category Repository Implementation for Web - CRUD Template
-    /// </summary>
     public class CategoryRepository : BaseRepository, ICategoryRepository
     {
-        public CategoryRepository(IConfiguration configuration) : base(configuration)
+        private readonly AppDbContext _context;
+
+        public CategoryRepository(IConfiguration configuration, AppDbContext context) : base(configuration)
         {
+            _context = context;
         }
 
-        /// <summary>
-        /// Get all categories with filtering and pagination
-        /// </summary>
-        public async Task<List<CatetoryResponseModel>> GetAllAsync(FilterDto filterDto)
+        public async Task<List<CategoryResponseModel>> GetAllAsync(FilterDto filterDto)
         {
             DynamicParameters parameter = new DynamicParameters();
 
             parameter.Add("@PageNumber", filterDto.PageNumber, DbType.Int32, ParameterDirection.Input);
             parameter.Add("@PageSize", filterDto.PageSize, DbType.Int32, ParameterDirection.Input);
-            parameter.Add("@SearchTerm", filterDto .SearchTerm, DbType.String, ParameterDirection.Input);
+            parameter.Add("@SearchTerm", filterDto.SearchTerm, DbType.String, ParameterDirection.Input);
             parameter.Add("@SortColumns", filterDto.SortCulumn, DbType.String, ParameterDirection.Input);
             parameter.Add("@SortDirection", filterDto.SortDirection, DbType.String, ParameterDirection.Input);
 
-            return await GetAsyncList<CatetoryResponseModel>(
+            return await GetAsyncList<CategoryResponseModel>(
                 "[dbo].[usp_GetAllCategories]",
                 parameter,
                 CommandType.StoredProcedure,
                 DataBaseNameEnum.APNAPASHU
             );
-
         }
 
-        /// <summary>
-        /// Get category by ID
-        /// </summary>
-        public async Task<CatetoryResponseModel> GetByIdAsync(int categoryId)
+        public async Task<CategoryResponseModel> GetByIdAsync(int id)
         {
-            string query = @"SELECT CategoryId, CategoryName, Description, IconUrl,
-                    CreatedDate, UpdatedDate, IsActive
-                    FROM Categories";
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@Id", id);
 
-            var result = await GetAsyncList<CatetoryResponseModel>(
-                query,
-                null,
-                CommandType.Text,
+            var result = await GetAsyncList<CategoryResponseModel>(
+                "[dbo].[usp_Category_GetById]",
+                parameters,
+                CommandType.StoredProcedure,
                 DataBaseNameEnum.APNAPASHU
             );
 
-            return result.FirstOrDefault(x => x.Id == categoryId);
+            return result.FirstOrDefault()!;
         }
 
-        /// <summary>
-        /// Create category
-        /// </summary>
+        public async Task<List<CategoryResponseModel>> GetByIdsAsync(List<int> ids)
+        {
+            if (ids == null || !ids.Any()) return new List<CategoryResponseModel>();
+            
+            var query = await _context.Categories
+                .Where(x => x.Id.HasValue && ids.Contains(x.Id.Value))
+                .Select(x => new CategoryResponseModel
+                {
+                    Id = x.Id ?? 0,
+                    CategoryName = x.CategoryName,
+                    Description = x.Description,
+                    ImagePath = x.ImagePath,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+                
+            return query;
+        }
+
         public async Task<SqlResponseModel> UpsertAsync(CategoryUpsertModel model, int userId)
         {
             var parameters = new DynamicParameters();
-
-            parameters.Add("@CategoryId", model.Id);
+            parameters.Add("@Id", model.Id);
             parameters.Add("@CategoryName", model.CategoryName);
             parameters.Add("@Description", model.Description);
-            parameters.Add("@ImagePage", model.ImagePath);
+            parameters.Add("@ImagePath", model.ImagePath);
+            parameters.Add("@IsActive", model.IsActive);
             parameters.Add("@UserId", userId);
 
-
             return await AddAsync<SqlResponseModel>(
-                "usp_UpsertCategory",
+                "[dbo].[usp_Category_Upsert]",
                 parameters,
                 CommandType.StoredProcedure,
                 DataBaseNameEnum.APNAPASHU
             );
         }
 
-        /// <summary>
-        /// Update category status (IsActive)
-        /// </summary>
         public async Task<SqlResponseModel> UpdateStatusAsync(UpdateStatusDto model)
         {
-            DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@Id", model.Id);
-            parameters.Add("@IsActive", model.Status ? 1 : 0);
-            parameters.Add("@UserId", model.UserId);
+            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (category != null)
+            {
+                category.IsActive = model.Status;
+                category.UpdatedBy = model.UserId;
+                category.UpdatedDate = DateTime.Now;
 
-
-            return await UpdateAsync<SqlResponseModel>(
-                "dbo.usp_UpdateCategoryStatus",
-                parameters,
-                CommandType.StoredProcedure,
-                DataBaseNameEnum.APNAPASHU
-            );
+                await _context.SaveChangesAsync();
+                
+                return new SqlResponseModel { StatusCode = "SUCCESS", Message = "Category status updated successfully" };
+            }
+            
+            return new SqlResponseModel { StatusCode = "ERROR", Message = "Category not found" };
         }
 
-        public async Task<SqlResponseModel> DeleteAsync(int categoryId, int userId)
+        public async Task<SqlResponseModel> DeleteAsync(string ids, int userId)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@Id", categoryId);
+            parameters.Add("@Ids", ids);
+            parameters.Add("@UserId", userId);
 
             return await UpdateAsync<SqlResponseModel>(
-                "dbo.usp_DeleteCategory",
+                "[dbo].[usp_Category_MultiDelete]",
                 parameters,
                 CommandType.StoredProcedure,
                 DataBaseNameEnum.APNAPASHU
             );
         }
-
     }
 }
