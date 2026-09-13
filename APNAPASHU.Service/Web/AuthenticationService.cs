@@ -151,8 +151,15 @@ namespace APNAPASHU.Service.Web
                 };
             }
 
-            // The SP returns the user's current hash in user.PasswordHash
             bool isValid = EncryptionDecryption.ValidatePassword(decryptedPassword, user.PasswordHash);
+            if (!isValid && !string.IsNullOrEmpty(user.PasswordHash))
+            {
+                var decryptedDbPass = EncryptionDecryption.Decrypt(user.PasswordHash, encryptionKey);
+                if (!string.IsNullOrEmpty(decryptedDbPass) && decryptedDbPass == decryptedPassword)
+                {
+                    isValid = true;
+                }
+            }
 
             if (isValid && user.StatusCode == "SUCCESS")
             {

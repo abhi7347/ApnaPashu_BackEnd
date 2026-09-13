@@ -14,6 +14,7 @@ namespace APNAPASHU.Repository.Data
 
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<Users> Users { get; set; }
         public DbSet<PostedAnimal> PostedAnimals { get; set; }
         public DbSet<PostedAnimalImage> PostedAnimalImages { get; set; }
         public DbSet<AnimalPromotion> AnimalPromotions { get; set; }

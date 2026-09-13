@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using APNAPASHU.DataContract.Models;
-using APNAPASHU.DataContract.Models.Web.Admin.Categories;
+using APNAPASHU.DataContract.Models.Web.Admin.User;
 using APNAPASHU.ServiceContract.Web.Admin;
 using System.Net;
 
@@ -9,43 +8,41 @@ namespace APNAPASHU.API.Controllers.Web.Admin
 {
     [Route("api/admin/[controller]")]
     [ApiController]
-    public class CategoryController : BaseController
+    public class UserController : BaseController
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IUserService _userService;
 
-        public CategoryController(
-            ICategoryService categoryService,
+        public UserController(
+            IUserService userService,
             IHttpContextAccessor httpContextAccessor,
             IConfiguration configuration)
             : base(httpContextAccessor, configuration)
         {
-            _categoryService = categoryService;
+            _userService = userService;
         }
 
-        [AllowAnonymous]
         [HttpGet("get-all")]
-        [ProducesResponseType(typeof(JsonModel<List<CategoryResponseModel>>), 200)]
+        [ProducesResponseType(typeof(JsonModel<List<UserResponseModel>>), 200)]
         public async Task<IActionResult> GetAll([FromQuery] FilterDto filter)
         {
-            var result = await _categoryService.GetAllAsync(filter);
+            var result = await _userService.GetAllAsync(filter);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
 
-        [AllowAnonymous]
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(JsonModel<CategoryResponseModel>), 200)]
+        [ProducesResponseType(typeof(JsonModel<UserResponseModel>), 200)]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _categoryService.GetByIdAsync(id);
+            var result = await _userService.GetByIdAsync(id);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.OK, result);
         }
 
         [HttpPost("upsert")]
         [ProducesResponseType(typeof(JsonModel<object>), 200)]
-        public async Task<IActionResult> Upsert([FromForm] CategoryUpsertModel model)
+        public async Task<IActionResult> Upsert([FromBody] UserUpsertModel model)
         {
             int userId = GetAuthenticatedUserId();
-            var result = await _categoryService.UpsertAsync(model, userId);
+            var result = await _userService.UpsertAsync(model, userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
 
@@ -55,7 +52,7 @@ namespace APNAPASHU.API.Controllers.Web.Admin
         {
             int userId = GetAuthenticatedUserId();
             model.UserId = userId;
-            var result = await _categoryService.UpdateStatusAsync(model);
+            var result = await _userService.UpdateStatusAsync(model);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
 
@@ -64,7 +61,7 @@ namespace APNAPASHU.API.Controllers.Web.Admin
         public async Task<IActionResult> Delete([FromBody] List<int> ids)
         {
             int userId = GetAuthenticatedUserId();
-            var result = await _categoryService.DeleteAsync(ids, userId);
+            var result = await _userService.DeleteAsync(ids, userId);
             return StatusCode(result.StatusCode ?? (int)HttpStatusCode.BadRequest, result);
         }
     }
