@@ -7,10 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entity\Buyer\" />
-    <Folder Include="Entity\Seller\" />
+    <Compile Remove="Entity\Buyer\**" />
+    <Compile Remove="Entity\Seller\**" />
+    <Compile Remove="Models\Web\Buyer\**" />
+    <EmbeddedResource Remove="Entity\Buyer\**" />
+    <EmbeddedResource Remove="Entity\Seller\**" />
+    <EmbeddedResource Remove="Models\Web\Buyer\**" />
+    <None Remove="Entity\Buyer\**" />
+    <None Remove="Entity\Seller\**" />
+    <None Remove="Models\Web\Buyer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Models\Mobile\" />
-    <Folder Include="Models\Web\Buyer\" />
   </ItemGroup>
 
   <ItemGroup>

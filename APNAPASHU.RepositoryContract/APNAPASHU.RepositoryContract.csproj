@@ -7,12 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Web\Buyer\**" />
+    <EmbeddedResource Remove="Web\Buyer\**" />
+    <None Remove="Web\Buyer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\APNAPASHU.DataContract\APNAPASHU.DataContract.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Mobile\" />
-    <Folder Include="Web\Buyer\" />
   </ItemGroup>
 
 </Project>

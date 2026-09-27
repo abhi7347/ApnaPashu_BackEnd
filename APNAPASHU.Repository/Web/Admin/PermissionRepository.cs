@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using APNAPASHU.DataContract.Models;
 using APNAPASHU.DataContract.Models.Web.Admin.Permission;
 using APNAPASHU.RepositoryContract.Web.Admin;

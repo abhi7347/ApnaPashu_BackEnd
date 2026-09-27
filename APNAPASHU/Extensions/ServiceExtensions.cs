@@ -1,4 +1,9 @@
 using APNAPASHU.Repository;
+using APNAPASHU.Service;
+using APNAPASHU.Repository.Web.Users;
+using APNAPASHU.RepositoryContract.Web.Users;
+using APNAPASHU.Service.Web.Users;
+using APNAPASHU.ServiceContract.Web.Users;
 using APNAPASHU.Repository.Web;
 using APNAPASHU.Repository.Web.Admin;
 using APNAPASHU.Repository.Web.Seller;
@@ -74,6 +79,12 @@ namespace APNAPASHU.API.Extensions
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
+            services.AddScoped<ISupportTicketService, SupportTicketService>();
+
+            services.AddScoped<IAdminSupportTicketRepository, AdminSupportTicketRepository>();
+            services.AddScoped<IAdminSupportTicketService, AdminSupportTicketService>();
 
             // Mobile APIs
 

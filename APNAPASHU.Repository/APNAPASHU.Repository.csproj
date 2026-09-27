@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Web\Buyer\**" />
+    <EmbeddedResource Remove="Web\Buyer\**" />
+    <None Remove="Web\Buyer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.15" />
     <PackageReference Include="FluentValidation" Version="11.8.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
@@ -23,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="Mobile\" />
-    <Folder Include="Web\Buyer\" />
   </ItemGroup>
 
 </Project>

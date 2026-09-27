@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Web\Buyer\**" />
+    <EmbeddedResource Remove="Web\Buyer\**" />
+    <None Remove="Web\Buyer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
@@ -18,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Mobile\" />
-    <Folder Include="Web\Buyer\" />
   </ItemGroup>
 
 </Project>
